@@ -27,7 +27,15 @@ public class GameManager : MonoBehaviour {
         Timed
     }
 
+    public enum Difficulty
+    {
+        Easy,
+        Normal,
+        Hard
+    }
+
     private Mode mode;
+    [SerializeField]private Difficulty difficulty;
 
     private WordsManager _wordsManager;
 
@@ -49,5 +57,20 @@ public class GameManager : MonoBehaviour {
     public void SetMode(Mode _mode)
     {
         mode = _mode;
+    }
+
+    public void SetDifficulty(Difficulty _difficulty)
+    {
+        difficulty = _difficulty;
+    }
+
+    public Mode GetMode()
+    {
+        return mode;
+    }
+
+    public Difficulty GetDifficulty()
+    {  
+        return difficulty; 
     }
 }
