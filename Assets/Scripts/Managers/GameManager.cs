@@ -21,35 +21,33 @@ public class GameManager : MonoBehaviour {
 
     #endregion
 
-    //[Header("Objects")]
-    //public GameObject player;
-    //public GameObject inventory;
-    //public GameObject crafting;
-    //public GameObject cam;
-    //public GameObject npcNameText;
-    //public GameObject map;
-    //public GameObject cameraMap;
-    //public GameObject playerIconeMap;
-    //public GameObject pauseMenu;
+    public enum Mode
+    {
+        Normal,
+        Timed
+    }
 
-    //[Header("References")]
-    //public PlayerController playerController;
-    //public CameraController cameraController;
-    //[SerializeField] private Script scriptToExecute;
+    private Mode mode;
+
+    private WordsManager _wordsManager;
 
     private void Awake() {
-
-        //playerController = player.GetComponent<PlayerController>();
-        //cameraController = cam.GetComponent<CameraController>();
+        
+        _wordsManager = GetComponent<WordsManager>();
 	}
 
     private void Start() {
-        
-        //ScriptingManager.Instance.StartScript(scriptToExecute);
+
+
     }
 
 	public void Exit() {
 
         Application.Quit();
+    }
+
+    public void SetMode(Mode _mode)
+    {
+        mode = _mode;
     }
 }

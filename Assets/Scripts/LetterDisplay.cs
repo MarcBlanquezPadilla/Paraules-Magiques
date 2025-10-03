@@ -1,7 +1,8 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class LetterDIsplay : MonoBehaviour
+public class LetterDisplay : MonoBehaviour
 {
     TextMeshProUGUI textMeshPro;
     char letter;
@@ -11,12 +12,7 @@ public class LetterDIsplay : MonoBehaviour
         textMeshPro = GetComponentInChildren<TextMeshProUGUI>();
     }
 
-    void OnEnable()
-    {
-        ChangeLetter(' ');
-    }
-
-    void ChangeLetter(char _letter)
+    public void ChangeLetter(char _letter)
     {
         letter = _letter;
         textMeshPro.text = _letter.ToString();

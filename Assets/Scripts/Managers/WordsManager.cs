@@ -3,35 +3,32 @@ using System;
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 
 public class WordsManager : MonoBehaviour
 {
-    #region Instance
-
-    private static WordsManager _instance;
-    public static WordsManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindFirstObjectByType<WordsManager>();
-            }
-            return _instance;
-        }
-    }
-
-    #endregion
-
-
     [SerializeField] private TextAsset wordsTextAsset;
     [SerializeField] private List<string> wordsList = new List<string>();
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    [SerializeField] private string currentWord;
+    [SerializeField] private string mixedCurrentWord;
+    
+    [SerializeField] private WordDisplayManager _wordDisplayManager;
 
 
     private void Awake()
     {
+        _wordDisplayManager = FindFirstObjectByType<WordDisplayManager>();
+
+        //INIT WORDS
         LoadWords();
+    }
+
+    private void Start()
+    {
+        ChangeWord();
+        _wordDisplayManager.ShowWord(mixedCurrentWord);
     }
 
     void LoadWords()
@@ -55,9 +52,25 @@ public class WordsManager : MonoBehaviour
         }
     }
 
-    public string GetRandomWord()
+    public void ChangeWord()
     {
-        string word = wordsList[UnityEngine.Random.Range(0, wordsList.Count)];
-        return word;
+        //GET NEW WORD
+        currentWord = wordsList[UnityEngine.Random.Range(0, wordsList.Count)];
+
+        //MIX NEW WORD
+        mixedCurrentWord = currentWord.ToCharArray().OrderBy(c => UnityEngine.Random.value).ToArray().ArrayToString();
     }
+
+    public string GetCurrentWord()
+    {
+        //RETURN CURRENT WORD
+        return currentWord;
+    }
+
+    public string GetMixedCurrentWord()
+    {
+        //RETURN MIXED WORD
+        return mixedCurrentWord;
+    }
+
 }
