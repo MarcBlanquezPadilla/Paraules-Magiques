@@ -17,4 +17,9 @@ public class LetterDisplay : MonoBehaviour
         letter = _letter;
         textMeshPro.text = _letter.ToString();
     }
+    public char GetLetter()
+    {
+        return letter;
+    }
+
 }
