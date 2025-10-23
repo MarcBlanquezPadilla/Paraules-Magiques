@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class LetterDisplay : MonoBehaviour
 {
     TextMeshProUGUI textMeshPro;
-    char letter;
+    [SerializeField] char letter;
 
     private void Awake()
     {
