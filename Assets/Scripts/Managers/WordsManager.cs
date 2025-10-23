@@ -163,12 +163,15 @@ public class WordsManager : MonoBehaviour
         }
 
         // 2. Activar y asignar letra según el string mixedWord
-        // Nos aseguramos de que no intentamos mostrar más letras de las que tenemos displays
         int lettersToDisplay = Mathf.Min(mixedWord.Length, mixedLetterDisplays.Count);
         for (int i = 0; i < lettersToDisplay; i++)
         {
             mixedLetterDisplays[i].GetComponent<LetterDisplay>().ChangeLetter(mixedWord[i]);
             mixedLetterDisplays[i].SetActive(true);
+
+            // --- ¡AÑADE ESTA LÍNEA! ---
+            // Forzamos el orden visual para que coincida con el orden de los datos
+            mixedLetterDisplays[i].transform.SetSiblingIndex(i);
         }
 
         // --- Actualizar CurrentLetterDisplays ---
@@ -180,12 +183,15 @@ public class WordsManager : MonoBehaviour
         }
 
         // 2. Activar y asignar letra según el string currentWord
-        // Nos aseguramos de que no intentamos mostrar más letras de las que tenemos displays
         lettersToDisplay = Mathf.Min(currentWord.Length, currentLetterDisplays.Count);
         for (int i = 0; i < lettersToDisplay; i++)
         {
             currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeLetter(currentWord[i]);
             currentLetterDisplays[i].SetActive(true);
+
+            // --- ¡AÑADE ESTA LÍNEA TAMBIÉN! ---
+            // (Por consistencia y para evitar bugs futuros)
+            currentLetterDisplays[i].transform.SetSiblingIndex(i);
         }
     }
 
