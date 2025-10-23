@@ -2396,6 +2396,7 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: e51440fb5918c4b459439f02e4bb65ca, type: 2}
   mode: 0
   difficulty: 0
+  _bruixa: {fileID: 1737194432}
 --- !u!1001 &1169001780
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3484,6 +3485,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1737194431}
+  - component: {fileID: 1737194432}
   m_Layer: 0
   m_Name: Bruixa
   m_TagString: Untagged
@@ -3507,6 +3509,18 @@ Transform:
   - {fileID: 616417665}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1737194432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737194430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2229e47e18243f4d91821ec6943f81a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1795158863
 PrefabInstance:
   m_ObjectHideFlags: 0
