@@ -43,10 +43,10 @@ public class AudioManager : MonoBehaviour
     public void SetAudio(string audio)
     {
 
-        playAudio(audio);
+        PlayAudio(audio);
     }
 
-    public bool playAudio(string audio)
+    public bool PlayAudio(string audio)
     {
 
         for (int i = 0; i < audioSources.Count; i++)
@@ -65,7 +65,7 @@ public class AudioManager : MonoBehaviour
         return false;
     }
 
-    public bool playAudio(string audio, float volume)
+    public bool PlayAudio(string audio, float volume)
     {
 
         for (int i = 0; i < audioSources.Count; i++)
@@ -115,7 +115,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void PlaySongFaster(string audio, float multiple)
+    public void PlaySong(string audio, float multiple = 1)
     {
 
         for (int i = 0; i < audioSources.Count; i++)
@@ -126,6 +126,7 @@ public class AudioManager : MonoBehaviour
 
                 audioSources[i].clip = _items[audio].audioFile;
                 audioSources[i].pitch = multiple;
+                audioSources[i].loop = true;
             }
         }
     }

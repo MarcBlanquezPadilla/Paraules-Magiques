@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour {
     private void Awake() {
         
         _wordsManager = GetComponent<WordsManager>();
+        AudioManager.Instance.PlaySong("musicaMenu");
 	}
 
     private void Start() {
