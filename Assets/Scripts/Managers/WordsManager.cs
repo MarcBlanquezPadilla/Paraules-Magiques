@@ -25,8 +25,9 @@ public class WordsManager : MonoBehaviour
     [SerializeField] private Transform mixedParent;
     [SerializeField] private Transform substituteDisplay;
 
-    // --- ¡NUEVA VARIABLE! ---
-    // Para guardar el ÍNDICE DE DATOS de la letra que estamos arrastrando
+    List<string> doneWords = new List<string>();
+
+
     private int draggedLetterSourceIndex = -1;
 
     private void Awake()
@@ -36,13 +37,6 @@ public class WordsManager : MonoBehaviour
         LoadLetterDisplays();
     }
 
-    private void Start()
-    {
-        ChangeWord();
-        UpdateDisplay();
-    }
-
-    // ... (LoadWords y LoadLetterDisplays sin cambios) ...
 
     private void LoadWords()
     {
@@ -82,7 +76,18 @@ public class WordsManager : MonoBehaviour
     public void ChangeWord()
     {
         //GET NEW WORD
-        originalWord = wordsList[UnityEngine.Random.Range(0, wordsList.Count)];
+
+        bool different = true;
+        do
+        {
+            originalWord = wordsList[UnityEngine.Random.Range(0, wordsList.Count)];
+            foreach (string word in doneWords)
+            {
+                if (originalWord == word) different = false;
+            }
+        }
+        while (!different);
+
         startCurrentWord = "";
         startMixedWord = "";
 
@@ -141,16 +146,18 @@ public class WordsManager : MonoBehaviour
 
         currentWord = startCurrentWord;
         mixedWord = startMixedWord;
+
+        UpdateDisplay();
     }
 
-    private void ReloadWord()
+    public void ReloadWord()
     {
         currentWord = startCurrentWord;
         mixedWord = startMixedWord;
+        UpdateDisplay ();
     }
 
 
-    // ... (UpdateDisplay sin cambios) ...
 
     private void UpdateDisplay()
     {
@@ -307,8 +314,6 @@ public class WordsManager : MonoBehaviour
     }
 
 
-    // ... (CheckIfSolved, GetCurrentWord, GetMixedCurrentWord sin cambios) ...
-
     public void CheckIfSolved()
     {
         bool ended = true;
@@ -321,18 +326,12 @@ public class WordsManager : MonoBehaviour
         {
             if (currentWord == originalWord)
             {
-                // ¡Correcto! Cargar la siguiente palabra
-                Debug.Log("¡Palabra completada!");
-                ChangeWord();   // Carga una nueva palabra
-                UpdateDisplay(); // Muestra la nueva palabra
+                doneWords.Add(originalWord);
+                GameManager.Instance.CompleteWord();
             }
             else
             {
-                // La palabra está completa, pero es incorrecta
-                ReloadWord();
-                UpdateDisplay();
-                Debug.Log("Palabra incorrecta.");
-                // (Aquí podrías añadir un feedback visual, como vibrar o poner las letras en rojo)
+                GameManager.Instance.FailWord();
             }
         }
     }

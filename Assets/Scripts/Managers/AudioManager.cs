@@ -18,19 +18,7 @@ public class AudioManager : MonoBehaviour
 
     #region instance
 
-    private static AudioManager _instance;
-    public static AudioManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindFirstObjectByType<AudioManager>();
-                DontDestroyOnLoad(_instance);
-            }
-            return _instance;
-        }
-    }
+    public static AudioManager Instance { get; private set; }
 
     #endregion
 
@@ -39,41 +27,40 @@ public class AudioManager : MonoBehaviour
 
     [SerializeField] private Dictionary<string, audioFiles> _items = new Dictionary<string, audioFiles>();
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        for (int i = 0; i < files.Count; i++)
+        {
+
+            _items.Add(files[i].name, files[i]);
+        }
+
+        StopAll();
+    }
 
     public void SetAudio(string audio)
     {
-
         PlayAudio(audio);
     }
 
-    public bool PlayAudio(string audio)
+    public bool PlayAudio(string audio, float volume = 1)
     {
 
         for (int i = 0; i < audioSources.Count; i++)
         {
-
             if (audioSources[i].clip == null || !audioSources[i].isPlaying)
             {
-                audioSources[i].clip = _items[audio].audioFile;
-                audioSources[i].outputAudioMixerGroup = _items[audio].mixer;
-                audioSources[i].volume = 1;
-                audioSources[i].pitch = 1;
-                audioSources[i].Play();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool PlayAudio(string audio, float volume)
-    {
-
-        for (int i = 0; i < audioSources.Count; i++)
-        {
-
-            if (audioSources[i].clip == null || !audioSources[i].isPlaying)
-            {
-
                 audioSources[i].clip = _items[audio].audioFile;
                 audioSources[i].outputAudioMixerGroup = _items[audio].mixer;
                 audioSources[i].volume = volume;
@@ -115,33 +102,25 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void PlaySong(string audio, float multiple = 1)
+    public bool PlaySong(string audio, float volume = 1, float multiple = 1)
     {
 
         for (int i = 0; i < audioSources.Count; i++)
         {
-
-            if (audioSources[i].clip != null || audioSources[i].isPlaying)
+            if (audioSources[i].clip == null || !audioSources[i].isPlaying)
             {
-
                 audioSources[i].clip = _items[audio].audioFile;
-                audioSources[i].pitch = multiple;
+                audioSources[i].outputAudioMixerGroup = _items[audio].mixer;
+                audioSources[i].volume = volume;
+                audioSources[i].pitch = 1;
                 audioSources[i].loop = true;
+                audioSources[i].Play();
+                return true;
             }
         }
+        return false;
     }
 
-    private void Awake()
-    {
-
-        for (int i = 0; i < files.Count; i++)
-        {
-
-            _items.Add(files[i].name, files[i]);
-        }
-
-        StopAll();
-    }
 
     public void StopAll()
     {
@@ -152,4 +131,6 @@ public class AudioManager : MonoBehaviour
             audioSources[i].Stop();
         }
     }
+
+
 }

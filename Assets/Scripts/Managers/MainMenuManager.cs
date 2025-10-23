@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MenusManager : MonoBehaviour
+public class MainMenuManager : MonoBehaviour
 {
     public GameObject MenuPrincipal; 
     public GameObject MenuSecundario; 
@@ -8,9 +8,13 @@ public class MenusManager : MonoBehaviour
 
     private GameObject LastMenu;
 
+    private void Awake()
+    {
+        AudioManager.Instance.PlaySong("musicaMenu");
+    }
+
     public void OpenMenu(GameObject currentMenu)
     {
-
         LastMenu = currentMenu;
 
         currentMenu.SetActive(false);
@@ -21,5 +25,4 @@ public class MenusManager : MonoBehaviour
         MenuSettings.SetActive(false);
         LastMenu.SetActive(true);
     }
-
 }

@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+
 
 public class GameManager : MonoBehaviour {
 
@@ -34,20 +34,26 @@ public class GameManager : MonoBehaviour {
         Hard
     }
 
-    private Mode mode;
-    [SerializeField]private Difficulty difficulty;
+    [SerializeField] GameData data;
+
+    [SerializeField] private Mode mode;
+    [SerializeField] private Difficulty difficulty;
+
 
     private WordsManager _wordsManager;
+    [SerializeField] private BruixaBehaviour _bruixa;
+
 
     private void Awake() {
-        
+
+        difficulty = (Difficulty) data.difficulty;
+        mode = (Mode) data.mode;
         _wordsManager = GetComponent<WordsManager>();
-        AudioManager.Instance.PlaySong("musicaMenu");
 	}
 
     private void Start() {
 
-
+        _wordsManager.ChangeWord();
     }
 
 	public void Exit() {
@@ -73,5 +79,17 @@ public class GameManager : MonoBehaviour {
     public Difficulty GetDifficulty()
     {  
         return difficulty; 
+    }
+
+    public void CompleteWord()
+    {
+        _wordsManager.ChangeWord();
+        _bruixa.BruixaHappy();
+    }
+
+    public void FailWord()
+    {
+        _wordsManager.ReloadWord();
+        _bruixa.BruixaSad();
     }
 }
