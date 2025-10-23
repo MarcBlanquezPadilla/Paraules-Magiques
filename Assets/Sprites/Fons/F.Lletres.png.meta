@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e598ae7ed1106ba4ba1b54e259d46d90
+guid: 3fc1cb61d1554fa4699e5be1db4c8bc6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1251124137448294135
-    second: F.Lletres_0
+      213: -5460686033236049707
+    second: F.Lletres 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,28 +96,15 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: F.Lletres_0
+      name: F.Lletres 1_0
       rect:
         serializedVersion: 2
         x: 67
-        y: 208
+        y: 8
         width: 1067
         height: 583
       alignment: 0
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7f6c58636c2ec5110800000000000000
-      internalID: 1251124137448294135
+      spriteID: 5d047071cfeb734b0800000000000000
+      internalID: -5460686033236049707
       vertices: []
       indices: 
       edges: []
@@ -148,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      F.Lletres_0: 1251124137448294135
+      F.Lletres 1_0: -5460686033236049707
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
