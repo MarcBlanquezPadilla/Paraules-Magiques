@@ -77,9 +77,10 @@ public class WordsManager : MonoBehaviour
     {
         //GET NEW WORD
 
-        bool different = true;
+        bool different;
         do
         {
+            different = true;
             originalWord = wordsList[UnityEngine.Random.Range(0, wordsList.Count)];
             foreach (string word in doneWords)
             {
