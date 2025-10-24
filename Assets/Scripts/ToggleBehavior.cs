@@ -8,22 +8,22 @@ public class ToggleBehavior : MonoBehaviour
     [SerializeField] Sprite trueSprite;
     [SerializeField] Sprite falseSprite;
 
-    Toggle toggle;
     Image toggleImage;
 
-    void Start()
+    private void Awake()
     {
-        toggle = GetComponent<Toggle>();
         toggleImage = GetComponentInChildren<Image>();
     }
 
-    public void Toggle(bool toggle)
+
+    public void Toggle(bool t)
     {
-        if (toggle) 
+        GetComponent<Toggle>().isOn = t;
+        if (t) 
         { 
             toggleImage.sprite = trueSprite;
         }
-        if (!toggle) 
+        if (!t) 
         {  
             toggleImage.sprite = falseSprite;
         }

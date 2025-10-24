@@ -6,28 +6,34 @@ using UnityEngine.Audio;
 
 public class Settings : MonoBehaviour
 {
-    #region Instance
-
-    private static Settings _instance;
-    public static Settings Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindFirstObjectByType<Settings>();
-            }
-            return _instance;
-        }
-    }
-
-    #endregion
-
     bool musicMuted;
     bool sfxMuted;
 
     [SerializeField] AudioMixer musicMixer;
     [SerializeField] AudioMixer sfxMixer;
+
+    [SerializeField] GameObject toggleMusic;
+    [SerializeField] GameObject toggleSfx;
+
+    private void Start()
+    {
+        float musicVolume;
+        bool success = musicMixer.GetFloat("Volume", out musicVolume);
+        if (success)
+        {
+            bool mutedMusic = musicVolume == -80f;
+            toggleMusic.GetComponent<ToggleBehavior>().Toggle(mutedMusic);
+        }
+             
+
+        float sfxVolume;
+        success = musicMixer.GetFloat("Volume", out sfxVolume);
+        if (success)
+        {
+            bool mutedSfx = sfxVolume == -80f;
+            toggleMusic.GetComponent<ToggleBehavior>().Toggle(mutedSfx);
+        }
+    }
 
     public void MuteMusic(bool m)
     {

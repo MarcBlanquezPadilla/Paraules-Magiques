@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour {
 
     private WordsManager _wordsManager;
     [SerializeField] private BruixaBehaviour _bruixa;
+    [SerializeField] private GameObject pauseMenu;
 
 
     private void Awake() {
@@ -54,6 +55,7 @@ public class GameManager : MonoBehaviour {
     private void Start() {
 
         _wordsManager.ChangeWord();
+        pauseMenu.SetActive(false);
     }
 
 	public void Exit() {

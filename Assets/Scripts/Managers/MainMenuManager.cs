@@ -13,6 +13,13 @@ public class MainMenuManager : MonoBehaviour
         AudioManager.Instance.PlaySong("musicaMenu");
     }
 
+    private void Start()
+    {
+        MenuPrincipal.SetActive(true);
+        MenuSettings.SetActive(false);
+        MenuSecundario.SetActive(false);
+    }
+
     public void OpenMenu(GameObject currentMenu)
     {
         LastMenu = currentMenu;
