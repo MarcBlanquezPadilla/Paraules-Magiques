@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class MainMenuManager : MonoBehaviour
@@ -8,9 +9,12 @@ public class MainMenuManager : MonoBehaviour
 
     private GameObject LastMenu;
 
+    [SerializeField] GameObject mouseCounter;
+    [SerializeField] GameData data;
+
     private void Awake()
     {
-        AudioManager.Instance.PlaySong("musicaMenu");
+        
     }
 
     private void Start()
@@ -18,6 +22,8 @@ public class MainMenuManager : MonoBehaviour
         MenuPrincipal.SetActive(true);
         MenuSettings.SetActive(false);
         MenuSecundario.SetActive(false);
+        AudioManager.Instance.PlaySong("musicaMenu");
+        mouseCounter.GetComponentInChildren<TextMeshProUGUI>().text = data.mouses.ToString();
     }
 
     public void OpenMenu(GameObject currentMenu)
@@ -31,5 +37,10 @@ public class MainMenuManager : MonoBehaviour
     public void CloseMenu() {
         MenuSettings.SetActive(false);
         LastMenu.SetActive(true);
+    }
+
+    public void ChangeScene(string s)
+    {
+        ScenesManager.Instance.ChangeScene(s);
     }
 }

@@ -25,4 +25,9 @@ public class GameData : ScriptableObject
     {
         mode = m;
     }
+
+    public void SumMouse(int m)
+    {
+        mouses += m;
+    }
 }
