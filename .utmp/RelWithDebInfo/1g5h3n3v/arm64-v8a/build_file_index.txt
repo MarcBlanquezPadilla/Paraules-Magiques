@@ -1,0 +1,3 @@
+C:\Users\marcb\Documents\GitHub\Paraules-Magiques\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Users\marcb\Documents\GitHub\Paraules-Magiques\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\FramePacing\CMakeLists.txt
+C:\Users\marcb\Documents\GitHub\Paraules-Magiques\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

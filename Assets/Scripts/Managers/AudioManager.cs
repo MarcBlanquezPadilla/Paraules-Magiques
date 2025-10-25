@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-using System;
+using UnityEngine.Rendering;
 
 [Serializable]
 public class audioFiles
@@ -132,5 +133,15 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-
+    public bool IsPlaying(string name)
+    {
+        for (int i = 0; i < audioSources.Count; i++)
+        {
+            if (audioSources[i].clip == _items[name].audioFile && audioSources[i].isPlaying)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

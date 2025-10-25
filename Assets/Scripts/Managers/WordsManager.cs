@@ -25,6 +25,16 @@ public class WordsManager : MonoBehaviour
     [SerializeField] private Transform mixedParent;
     [SerializeField] private Transform substituteDisplay;
 
+    //Help
+    [SerializeField] private GameObject pistaDisplay;
+    [SerializeField] private GameObject mussol;
+    [SerializeField] private float timeToUnlockHelp;
+    [SerializeField] private float timeShowingHelp;
+    [SerializeField] private float pistaPositionOffset;
+    bool showingHelp;
+    float timerUnlockHelp;
+    float timerToHideHelp;
+
     List<string> doneWords = new List<string>();
 
 
@@ -35,8 +45,26 @@ public class WordsManager : MonoBehaviour
         //INIT WORDS
         LoadWords();
         LoadLetterDisplays();
+        timerUnlockHelp = 0f;
+        timerToHideHelp = 0f;
+        showingHelp = false;
     }
 
+    private void Update()
+    {
+        if (!showingHelp) timerUnlockHelp += Time.deltaTime;
+        else
+        {
+            timerToHideHelp += Time.deltaTime;
+            if (timerToHideHelp > timeShowingHelp)
+            {
+                HideHelp();
+            }
+        }
+
+        if (timerUnlockHelp > timeToUnlockHelp) mussol.GetComponent<MussolBehaviour>().ShowPista();
+        else mussol.GetComponent<MussolBehaviour>().HidePista();
+    }
 
     private void LoadWords()
     {
@@ -71,7 +99,42 @@ public class WordsManager : MonoBehaviour
         }
     }
 
-    // ... (ChangeWord sin cambios) ...
+    public void ShowHelp()
+    {
+        if (timerUnlockHelp > timeToUnlockHelp)
+        {
+            bool found = false;
+            int i = 0;
+            int iterations = 0;
+            do
+            {
+                iterations++;
+                if (iterations > 20) break;
+
+                i = UnityEngine.Random.Range(0, originalWord.Count());
+                if (currentWord[i] != originalWord[i]) found = true;
+            } while (!found && iterations < 20);
+
+            if (found) 
+            {
+                pistaDisplay.SetActive(true);
+                pistaDisplay.GetComponent<LetterDisplay>().ChangeLetter(originalWord[i]);
+                Vector3 pistaPosition = currentLetterDisplays[i].transform.position;
+                pistaPosition.y += pistaPositionOffset;
+                pistaDisplay.transform.position = pistaPosition;
+                showingHelp = true;
+                timerUnlockHelp = 0;
+            }
+        }
+    }
+
+    public void HideHelp()
+    {
+        timerToHideHelp = 0;
+        timerUnlockHelp = 0;
+        pistaDisplay.SetActive(false);
+        showingHelp=false;
+    }
 
     public void ChangeWord()
     {
@@ -149,6 +212,7 @@ public class WordsManager : MonoBehaviour
         mixedWord = startMixedWord;
 
         UpdateDisplay();
+        HideHelp();
     }
 
     public void ReloadWord()
@@ -157,8 +221,6 @@ public class WordsManager : MonoBehaviour
         mixedWord = startMixedWord;
         UpdateDisplay ();
     }
-
-
 
     private void UpdateDisplay()
     {
@@ -203,7 +265,6 @@ public class WordsManager : MonoBehaviour
         }
     }
 
-    // --- ¡FUNCIÓN MODIFICADA! ---
     public void OnStartDragLetter(GameObject letterDisplay)
     {
         // 1. Encontrar el ÍNDICE DE DATOS
@@ -292,6 +353,7 @@ public class WordsManager : MonoBehaviour
 
             // Limpiar la UI del drag
             letterDisplay.SetActive(false); // Ya no la necesitamos, UpdateDisplay creará las nuevas
+            HideHelp();
         }
         else
         {
@@ -312,6 +374,7 @@ public class WordsManager : MonoBehaviour
 
         // 8. Comprobar si se ha resuelto
         CheckIfSolved();
+       
     }
 
 

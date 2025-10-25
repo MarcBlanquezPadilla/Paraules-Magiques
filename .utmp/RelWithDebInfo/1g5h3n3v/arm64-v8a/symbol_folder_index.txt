@@ -1,0 +1,1 @@
+C:\Users\marcb\Documents\GitHub\Paraules-Magiques\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\1g5h3n3v\obj\arm64-v8a

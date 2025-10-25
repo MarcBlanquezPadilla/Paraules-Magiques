@@ -22,7 +22,7 @@ public class MainMenuManager : MonoBehaviour
         MenuPrincipal.SetActive(true);
         MenuSettings.SetActive(false);
         MenuSecundario.SetActive(false);
-        AudioManager.Instance.PlaySong("musicaMenu");
+        if (!AudioManager.Instance.IsPlaying("musicaMenu")) AudioManager.Instance.PlaySong("musicaMenu");
         mouseCounter.GetComponentInChildren<TextMeshProUGUI>().text = data.mouses.ToString();
     }
 
