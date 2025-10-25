@@ -74,12 +74,16 @@ public class ScenesManager : MonoBehaviour
         }
     }
 
+
     public void ChangeScene(string s)
     {
-        sceneToChange = s;
-        transitionTime = 0;
-        changedScene = false;
-        transitioning = true;
+        if (!transitioning)
+        {
+            sceneToChange = s;
+            transitionTime = 0;
+            changedScene = false;
+            transitioning = true;
+        }
     }
 
     public void Play()

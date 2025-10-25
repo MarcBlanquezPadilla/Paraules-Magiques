@@ -8,6 +8,7 @@ public class GameData : ScriptableObject
     public int mouses;
     public int difficulty;
     public int mode;
+    private int mouseNum;
 
     // Importante: Añade una función para resetear al empezar el juego
     public void Reset()
@@ -26,8 +27,13 @@ public class GameData : ScriptableObject
         mode = m;
     }
 
-    public void SumMouse(int m)
+    public void SumMouse()
     {
-        mouses += m;
+        mouses += mouseNum;
+    }
+
+    public void ChangeMouseNum(int mN)
+    {
+        mouseNum = mN;
     }
 }

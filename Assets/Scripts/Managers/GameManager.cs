@@ -41,13 +41,16 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Difficulty difficulty;
     
     [SerializeField] private int wordsToWin;
+    [SerializeField] private int timeToEnd;
 
     private WordsManager _wordsManager;
     [SerializeField] private BruixaBehaviour _bruixa;
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject contadorRatoli;
+    [SerializeField] private GameObject contadorTemps;
 
     private int wordCounter;
+    private float endTimer;
 
 
     private void Awake() {
@@ -56,16 +59,37 @@ public class GameManager : MonoBehaviour {
         mode = (Mode) data.mode;
         _wordsManager = GetComponent<WordsManager>();
         wordCounter = 0;
-	}
+        endTimer = 0;
+
+    }
 
     private void Start() {
 
         contadorRatoli.GetComponentInChildren<TextMeshProUGUI>().text = data.mouses.ToString();
         _wordsManager.ChangeWord();
         pauseMenu.SetActive(false);
+        
+        if(mode==Mode.Timed) contadorTemps.SetActive(true);
+        else contadorTemps.SetActive(false);
     }
 
-	public void Exit() {
+    private void Update()
+    {
+        endTimer += Time.deltaTime;
+        if (mode == Mode.Timed)
+        {
+            contadorTemps.GetComponentInChildren<TextMeshProUGUI>().text = ((int)Mathf.Clamp(timeToEnd-endTimer, 0, int.MaxValue)).ToString();
+            if (endTimer > timeToEnd)
+            {
+                int divider = Mathf.Clamp(timeToEnd / 10, 1, int.MaxValue);
+                int mousesToSum = wordCounter / divider;
+                data.ChangeMouseNum(mousesToSum);
+                ScenesManager.Instance.ChangeScene("MenuWin");
+            }
+        }
+    }
+
+    public void Exit() {
 
         Application.Quit();
     }
@@ -93,8 +117,9 @@ public class GameManager : MonoBehaviour {
     public void CompleteWord()
     {
         wordCounter++;
-        if (wordCounter >= wordsToWin)
+        if (wordCounter >= wordsToWin && mode == Mode.Normal)
         {
+            data.ChangeMouseNum(1);
             ScenesManager.Instance.ChangeScene("MenuWin");
         }
         else
@@ -102,7 +127,6 @@ public class GameManager : MonoBehaviour {
             _wordsManager.ChangeWord();
             _bruixa.BruixaHappy();
         }
-            
     }
 
     public void FailWord()

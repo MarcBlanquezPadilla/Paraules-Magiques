@@ -8,7 +8,7 @@ public class MenuRatoli : MonoBehaviour
     
     void Awake()
     {
-        data.SumMouse(1);
+        data.SumMouse();
     }
 
     public void ChangeScene(string s)

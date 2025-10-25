@@ -318,7 +318,7 @@ public class WordsManager : MonoBehaviour
         {
             if (currentWord[i] == ' ')
             {
-                float minDistance = currentLetterDisplays[i].GetComponent<RectTransform>().sizeDelta.x / 2;
+                float minDistance = 150 / 2;
                 float distance = Vector2.Distance(currentLetterDisplays[i].transform.position, letterDisplay.transform.position);
 
                 if (distance < minDistance)
