@@ -24,7 +24,8 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public enum Type
     {
         Mixed,
-        Current
+        Current,
+        Pista
     }
 
     public enum State
@@ -71,12 +72,12 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public void OnBeginDrag(PointerEventData eventData)
     {
         
-        if (state == State.Dragable) OnDragStart.Invoke(this.gameObject);
+        if (state == State.Dragable && type != Type.Pista) OnDragStart.Invoke(this.gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (state == State.Dragable)
+        if (state == State.Dragable && type != Type.Pista)
         {
             OnDragStay.Invoke(this.gameObject);
             rectTransform.anchoredPosition += eventData.delta / transform.root.localScale.x;
@@ -85,7 +86,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (state == State.Dragable) OnDragEnd.Invoke(this.gameObject);
+        if (state == State.Dragable && type != Type.Pista) OnDragEnd.Invoke(this.gameObject);
     }
 
 }

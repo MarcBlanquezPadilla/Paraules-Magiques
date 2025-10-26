@@ -11353,7 +11353,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   letter: 102
   state: 0
-  type: 0
+  type: 2
   OnDragStart:
     m_PersistentCalls:
       m_Calls: []
