@@ -46,8 +46,9 @@ public class GameManager : MonoBehaviour {
     private WordsManager _wordsManager;
     [SerializeField] private BruixaBehaviour _bruixa;
     [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject tutorialMenu;
     [SerializeField] private GameObject contadorRatoli;
-    [SerializeField] private GameObject contadorTemps;
+    [SerializeField] private GameObject contador;
 
     private int wordCounter;
     private float endTimer;
@@ -68,24 +69,32 @@ public class GameManager : MonoBehaviour {
         contadorRatoli.GetComponentInChildren<TextMeshProUGUI>().text = data.mouses.ToString();
         _wordsManager.ChangeWord();
         pauseMenu.SetActive(false);
-        
-        if(mode==Mode.Timed) contadorTemps.SetActive(true);
-        else contadorTemps.SetActive(false);
+        tutorialMenu.SetActive(false);
+
+
     }
 
     private void Update()
     {
         endTimer += Time.deltaTime;
-        if (mode == Mode.Timed)
+
+        switch (mode)
         {
-            contadorTemps.GetComponentInChildren<TextMeshProUGUI>().text = ((int)Mathf.Clamp(timeToEnd-endTimer, 0, int.MaxValue)).ToString();
-            if (endTimer > timeToEnd)
-            {
-                int divider = Mathf.Clamp(timeToEnd / 10, 1, int.MaxValue);
-                int mousesToSum = wordCounter / divider;
-                data.ChangeMouseNum(mousesToSum);
-                ScenesManager.Instance.ChangeScene("MenuWin");
-            }
+            case Mode.Normal:
+                contador.GetComponentInChildren<TextMeshProUGUI>().text = wordCounter + " / " + wordsToWin;
+                break;
+            
+            case Mode.Timed:
+                contador.GetComponentInChildren<TextMeshProUGUI>().text = ((int)Mathf.Clamp(timeToEnd - endTimer, 0, int.MaxValue)).ToString();
+                if (endTimer > timeToEnd)
+                {
+                    int divider = Mathf.Clamp(timeToEnd / 10, 1, int.MaxValue);
+                    int mousesToSum = wordCounter / divider;
+                    data.ChangeMouseNum(mousesToSum);
+                    data.wordsNum = wordCounter;
+                    ScenesManager.Instance.ChangeScene("MenuWin");
+                }
+                break;
         }
     }
 

@@ -15,9 +15,14 @@ public class ToggleBehavior : MonoBehaviour
         toggleImage = GetComponentInChildren<Image>();
     }
 
+    public void ToggleSound()
+    {
+        AudioManager.Instance.PlayAudio("soBoto");
+    }
 
     public void Toggle(bool t)
     {
+        
         GetComponent<Toggle>().isOn = t;
         if (t) 
         { 

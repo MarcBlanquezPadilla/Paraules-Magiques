@@ -293,6 +293,8 @@ public class WordsManager : MonoBehaviour
     // --- ¡FUNCIÓN MODIFICADA! ---
     public void OnEndDragLetter(GameObject letterDisplay)
     {
+       
+
         // 1. Comprobar si el drag era válido
         if (draggedLetterSourceIndex == -1)
         {
@@ -333,6 +335,8 @@ public class WordsManager : MonoBehaviour
         // 4. Si encontramos un hueco...
         if (foundDropTarget)
         {
+
+            AudioManager.Instance.PlayAudio("soLletres");
             // Modificamos los strings (el "modelo de datos")
 
             // Añadir letra a currentWord
@@ -392,10 +396,12 @@ public class WordsManager : MonoBehaviour
             {
                 doneWords.Add(originalWord);
                 GameManager.Instance.CompleteWord();
+                AudioManager.Instance.PlayAudio("soCorrecte");
             }
             else
             {
                 GameManager.Instance.FailWord();
+                AudioManager.Instance.PlayAudio("soIncorrecte", 0.7f);
             }
         }
     }

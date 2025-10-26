@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea9cdc83a9ad33e429cff47a1d9d8a23, type: 3}
   m_Name: GameData
   m_EditorClassIdentifier: 
-  mouses: 0
+  mouses: 13
   difficulty: 0
+  mode: 1
+  mouseNum: 4
+  wordsNum: 14
+  firstTime: 0
