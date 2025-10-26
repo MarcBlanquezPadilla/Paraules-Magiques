@@ -4,7 +4,6 @@ using UnityEngine.EventSystems;
 
 public class OnDragEvent : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    CanvasGroup canvasGroup;
     RectTransform rectTransform;
 
     [SerializeField] UnityEvent<GameObject> OnDragStart;
@@ -15,7 +14,6 @@ public class OnDragEvent : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     void Awake()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
     }
 

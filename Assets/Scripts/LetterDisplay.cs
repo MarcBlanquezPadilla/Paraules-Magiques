@@ -1,25 +1,91 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class LetterDisplay : MonoBehaviour
+public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     TextMeshProUGUI textMeshPro;
     [SerializeField] char letter;
+    [SerializeField] State state;
+    [SerializeField] Type type;
+
+    RectTransform rectTransform;
+
+    [SerializeField] UnityEvent<GameObject> OnDragStart;
+    [SerializeField] UnityEvent<GameObject> OnDragStay;
+    [SerializeField] UnityEvent<GameObject> OnDragEnd;
+
+    [SerializeField] Color lockedColor;
+
+    private Image image;
+
+    public enum Type
+    {
+        Mixed,
+        Current
+    }
+
+    public enum State
+    {
+        Locked, 
+        Dragable
+    };
 
     private void Awake()
     {
         textMeshPro = GetComponentInChildren<TextMeshProUGUI>();
+        rectTransform = GetComponent<RectTransform>();
+        state = State.Dragable;
     }
 
     public void ChangeLetter(char _letter)
     {
         letter = _letter;
         textMeshPro.text = _letter.ToString();
+        if (state == State.Locked) textMeshPro.color = lockedColor;
+        else textMeshPro.color = Color.white;
     }
+
+    public void ChangeState(State _state)
+    {
+        state = _state;
+    }
+
+    public State GetState()
+    {
+        return state;
+    }
+
     public char GetLetter()
     {
         return letter;
+    }
+
+    public Type GetLetterType()
+    {
+        return type;
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        
+        if (state == State.Dragable) OnDragStart.Invoke(this.gameObject);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (state == State.Dragable)
+        {
+            OnDragStay.Invoke(this.gameObject);
+            rectTransform.anchoredPosition += eventData.delta / transform.root.localScale.x;
+        }
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (state == State.Dragable) OnDragEnd.Invoke(this.gameObject);
     }
 
 }

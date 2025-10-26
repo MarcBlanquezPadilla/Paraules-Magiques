@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Rendering;
 using static GameManager;
 
@@ -21,6 +22,7 @@ public class WordsManager : MonoBehaviour
 
     [SerializeField] private List<GameObject> currentLetterDisplays;
     [SerializeField] private List<GameObject> mixedLetterDisplays;
+    [SerializeField] private List<GameObject> letterDisplays;
     [SerializeField] private Transform currentParent;
     [SerializeField] private Transform mixedParent;
     [SerializeField] private Transform substituteDisplay;
@@ -92,10 +94,12 @@ public class WordsManager : MonoBehaviour
         foreach (Transform letter in currentParent)
         {
             currentLetterDisplays.Add(letter.gameObject);
+            letterDisplays.Add(letter.gameObject);
         }
         foreach (Transform letter in mixedParent)
         {
             mixedLetterDisplays.Add(letter.gameObject);
+            letterDisplays.Add(letter.gameObject);
         }
     }
 
@@ -256,6 +260,8 @@ public class WordsManager : MonoBehaviour
         lettersToDisplay = Mathf.Min(currentWord.Length, currentLetterDisplays.Count);
         for (int i = 0; i < lettersToDisplay; i++)
         {
+            if (currentWord[i] == startCurrentWord[i]) currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeState(LetterDisplay.State.Locked);
+            else currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeState(LetterDisplay.State.Dragable);
             currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeLetter(currentWord[i]);
             currentLetterDisplays[i].SetActive(true);
 
@@ -269,53 +275,39 @@ public class WordsManager : MonoBehaviour
     {
         // 1. Encontrar el ÍNDICE DE DATOS
         // Buscamos el objeto que arrastramos en nuestra lista de displays
-        draggedLetterSourceIndex = mixedLetterDisplays.IndexOf(letterDisplay);
+        LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
 
-        // 2. Comprobación de seguridad
-        // Si no lo encontramos, o el índice es mayor que las letras que tenemos, es un error.
-        if (draggedLetterSourceIndex == -1 || draggedLetterSourceIndex >= mixedWord.Length)
+        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) draggedLetterSourceIndex = mixedLetterDisplays.IndexOf(letterDisplay);
+        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current)
         {
-            Debug.LogError($"Error al arrastrar: Índice {draggedLetterSourceIndex} fuera de rango para mixedWord '{mixedWord}'.");
-            draggedLetterSourceIndex = -1; // Invalidamos este drag
-            return; // No hacemos nada más
+            substituteDisplay.GetComponentInChildren<Image>().enabled = true;
+            draggedLetterSourceIndex = currentLetterDisplays.IndexOf(letterDisplay);
         }
+            
 
-        // 3. Lógica visual (como estaba antes)
-        // Usamos el índice visual (SiblingIndex) SÓLO para colocar el placeholder
         int visualIndex = letterDisplay.transform.GetSiblingIndex();
 
         letterDisplay.transform.SetParent(mixedParent.parent);
         substituteDisplay.gameObject.SetActive(true);
-        substituteDisplay.transform.SetParent(mixedParent);
+        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) substituteDisplay.transform.SetParent(mixedParent);
+        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) substituteDisplay.transform.SetParent(currentParent);
         substituteDisplay.transform.SetSiblingIndex(visualIndex);
     }
 
     // --- ¡FUNCIÓN MODIFICADA! ---
     public void OnEndDragLetter(GameObject letterDisplay)
     {
-       
-
-        // 1. Comprobar si el drag era válido
-        if (draggedLetterSourceIndex == -1)
-        {
-            // Este drag se marcó como inválido en OnStartDrag
-            // Limpiamos la UI y salimos
-            substituteDisplay.gameObject.SetActive(false);
-            substituteDisplay.transform.SetParent(mixedParent.parent);
-            letterDisplay.transform.SetParent(mixedParent);
-            UpdateDisplay(); // Para que todo vuelva a su sitio
-            return;
-        }
+        LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
 
         bool foundDropTarget = false;
-        int targetIndex = -1; // El índice del hueco (' ') en currentWord
+        int targetIndex = -1;
 
-        // 2. Usamos el ÍNDICE DE DATOS que guardamos
         int sourceIndex = draggedLetterSourceIndex;
-        char letterToMove = mixedWord[sourceIndex]; // Obtenemos la letra correcta desde el string
+        char letterToMove = ' ';
 
-        // 3. Encontrar un hueco válido para soltar (basado en distancia)
-        // Añadimos comprobación 'i < currentWord.Length' por si acaso
+        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) letterToMove = mixedWord[sourceIndex];
+        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) letterToMove = currentWord[sourceIndex];
+
         for (int i = 0; i < currentLetterDisplays.Count && i < currentWord.Length; i++)
         {
             if (currentWord[i] == ' ')
@@ -335,26 +327,19 @@ public class WordsManager : MonoBehaviour
         // 4. Si encontramos un hueco...
         if (foundDropTarget)
         {
-
             AudioManager.Instance.PlayAudio("soLletres");
             // Modificamos los strings (el "modelo de datos")
 
             // Añadir letra a currentWord
             char[] currentChars = currentWord.ToCharArray();
             currentChars[targetIndex] = letterToMove;
-            currentWord = new string(currentChars);
-
-            // Quitar letra de mixedWord
-            // Esta comprobación ahora debería ser siempre true, pero la dejamos por seguridad.
-            if (sourceIndex >= 0 && sourceIndex < mixedWord.Length)
+            if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
+            else
             {
                 mixedWord = mixedWord.Remove(sourceIndex, 1);
             }
-            else
-            {
-                Debug.LogError($"Error CRÍTICO: sourceIndex {sourceIndex} fuera de rango para mixedWord '{mixedWord}' al soltar.");
-            }
-
+            currentWord = new string(currentChars);
+            
             // Limpiar la UI del drag
             letterDisplay.SetActive(false); // Ya no la necesitamos, UpdateDisplay creará las nuevas
             HideHelp();
@@ -366,9 +351,11 @@ public class WordsManager : MonoBehaviour
         }
 
         // 5. Limpiamos la UI del drag (tanto si acierta como si falla)
+        substituteDisplay.GetComponentInChildren<Image>().enabled = false;
         substituteDisplay.gameObject.SetActive(false);
         substituteDisplay.transform.SetParent(mixedParent.parent);
-        letterDisplay.transform.SetParent(mixedParent); // La devolvemos al pool
+        if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Mixed) letterDisplay.transform.SetParent(mixedParent); // La devolvemos al pool
+        else if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Current) letterDisplay.transform.SetParent(currentParent); // La devolvemos al pool
 
         // 6. Resetear el índice de drag
         draggedLetterSourceIndex = -1;
