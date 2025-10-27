@@ -324,6 +324,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -343,6 +351,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -523,6 +535,57 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 616417666}
   m_SourcePrefab: {fileID: 4843985084834002234, guid: a92d66d11c403b04495fc51fc10399e3, type: 3}
+--- !u!1 &32675174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 32675176}
+  - component: {fileID: 32675175}
+  m_Layer: 0
+  m_Name: DataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &32675175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 32675174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c46e3e7266ae474a94ef7200668385b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data:
+    mouses: 0
+    difficulty: 0
+    mode: 0
+    mouseNum: 0
+    wordsNum: 0
+    firstTime: 0
+--- !u!4 &32675176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 32675174}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.758301, y: 169.61389, z: -12.2975235}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &51995392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1899,6 +1962,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -1918,6 +1989,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -3014,6 +3089,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -3033,6 +3116,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -3358,6 +3445,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -3377,6 +3472,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -3818,6 +3917,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -3837,6 +3944,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -4812,6 +4923,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -4831,6 +4950,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -5412,6 +5535,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -5431,6 +5562,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -6019,6 +6154,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -6038,6 +6181,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -6523,6 +6670,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -6542,6 +6697,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -7142,11 +7301,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ecb64ffdb557147ad40eee9e460007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: e51440fb5918c4b459439f02e4bb65ca, type: 2}
   mode: 1
   difficulty: 0
   wordsToWin: 10
   timeToEnd: 30
+  timeCorrectWord: 0.5
   _bruixa: {fileID: 1737194432}
   pauseMenu: {fileID: 1909560697}
   tutorialMenu: {fileID: 581720415}
@@ -7575,6 +7734,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -7594,6 +7761,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -8407,6 +8578,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -8426,6 +8605,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -10819,6 +11002,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: correctSprite
+      value: 
+      objectReference: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: defaultSprite
+      value: 
+      objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: lockedColor.a
       value: 1
       objectReference: {fileID: 0}
@@ -10838,6 +11029,10 @@ PrefabInstance:
       propertyPath: dragableSprite
       value: 
       objectReference: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+    - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
+      propertyPath: incorrectSprite
+      value: 
+      objectReference: {fileID: 2237584535397782166, guid: f8d549b1a948c5644b2de01d790ac557, type: 3}
     - target: {fileID: 8150865820398096530, guid: a646d0c7e673afc4b94ba1568a9a15cc, type: 3}
       propertyPath: OnDragEnd.m_PersistentCalls.m_Calls.Array.size
       value: 2
@@ -11364,6 +11559,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   lockedColor: {r: 0, g: 0, b: 0, a: 0}
+  defaultSprite: {fileID: 0}
+  correctSprite: {fileID: 0}
+  incorrectSprite: {fileID: 0}
 --- !u!1 &7976411095711779997
 GameObject:
   m_ObjectHideFlags: 0
@@ -11498,6 +11696,7 @@ SceneRoots:
   - {fileID: 1520640383}
   - {fileID: 619394802}
   - {fileID: 872997596}
+  - {fileID: 32675176}
   - {fileID: 1132761450}
   - {fileID: 819155597}
   - {fileID: 1957586293}

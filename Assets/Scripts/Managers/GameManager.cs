@@ -35,13 +35,12 @@ public class GameManager : MonoBehaviour {
         Hard
     }
 
-    [SerializeField] GameData data;
-
     [SerializeField] private Mode mode;
     [SerializeField] private Difficulty difficulty;
     
     [SerializeField] private int wordsToWin;
     [SerializeField] private int timeToEnd;
+    [SerializeField] private float timeCorrectWord;
 
     private WordsManager _wordsManager;
     [SerializeField] private BruixaBehaviour _bruixa;
@@ -52,31 +51,32 @@ public class GameManager : MonoBehaviour {
 
     private int wordCounter;
     private float endTimer;
+    private float correctWordTimer;
+    private bool changingWord;
+    private bool correct;
 
 
     private void Awake() {
 
-        difficulty = (Difficulty) data.difficulty;
-        mode = (Mode) data.mode;
+        difficulty = (Difficulty)DataManager.Instance.data.difficulty;
+        mode = (Mode)DataManager.Instance.data.mode;
         _wordsManager = GetComponent<WordsManager>();
         wordCounter = 0;
-        endTimer = 0;
 
     }
 
     private void Start() {
 
-        contadorRatoli.GetComponentInChildren<TextMeshProUGUI>().text = data.mouses.ToString();
+        contadorRatoli.GetComponentInChildren<TextMeshProUGUI>().text = DataManager.Instance.data.mouses.ToString();
         _wordsManager.ChangeWord();
         pauseMenu.SetActive(false);
         tutorialMenu.SetActive(false);
-
-
     }
 
     private void Update()
     {
         endTimer += Time.deltaTime;
+        
 
         switch (mode)
         {
@@ -90,11 +90,24 @@ public class GameManager : MonoBehaviour {
                 {
                     int divider = Mathf.Clamp(timeToEnd / 10, 1, int.MaxValue);
                     int mousesToSum = wordCounter / divider;
-                    data.ChangeMouseNum(mousesToSum);
-                    data.wordsNum = wordCounter;
+                    DataManager.Instance.data.mouses += mousesToSum;
+                    DataManager.Instance.data.mouseNum = mousesToSum;
+                    DataManager.Instance.data.wordsNum = wordCounter;
                     ScenesManager.Instance.ChangeScene("MenuWin");
                 }
                 break;
+        }
+
+        if (changingWord)
+        {
+            correctWordTimer += Time.deltaTime;
+
+            if (correctWordTimer > timeCorrectWord) 
+            {
+                if (correct) _wordsManager.ChangeWord();
+                else _wordsManager.ReloadWord();
+                changingWord = false;
+            }
         }
     }
 
@@ -128,24 +141,32 @@ public class GameManager : MonoBehaviour {
         wordCounter++;
         if (wordCounter >= wordsToWin && mode == Mode.Normal)
         {
-            data.ChangeMouseNum(1);
+            DataManager.Instance.data.mouseNum = 1;
+            DataManager.Instance.data.mouses += 1;
             ScenesManager.Instance.ChangeScene("MenuWin");
         }
         else
         {
-            _wordsManager.ChangeWord();
+            correctWordTimer = 0;
+            changingWord = true;
+            correct = true;
+            _wordsManager.ShowCorrect(correct);
             _bruixa.BruixaHappy();
         }
     }
 
     public void FailWord()
     {
-        _wordsManager.ReloadWord();
+        correct = false;
+        correctWordTimer = 0;
+        changingWord = true;
+        _wordsManager.ShowCorrect(correct);
         _bruixa.BruixaSad();
     }
 
     public void ChangeScene(string s)
     {
+        DataManager.Instance.SaveData();
         ScenesManager.Instance.ChangeScene(s);
     }
 }

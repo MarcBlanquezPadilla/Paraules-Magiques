@@ -382,6 +382,7 @@ public class WordsManager : MonoBehaviour
             if (currentWord == originalWord)
             {
                 doneWords.Add(originalWord);
+                UpdateDisplay();
                 GameManager.Instance.CompleteWord();
                 AudioManager.Instance.PlayAudio("soCorrecte");
             }
@@ -390,6 +391,13 @@ public class WordsManager : MonoBehaviour
                 GameManager.Instance.FailWord();
                 AudioManager.Instance.PlayAudio("soIncorrecte", 0.7f);
             }
+        }
+    }
+    public void ShowCorrect(bool correct)
+    {
+        for (int i = 0; i < currentLetterDisplays.Count; i++)
+        {
+            currentLetterDisplays[i].GetComponent<LetterDisplay>().ShowCorrect(correct);
         }
     }
 

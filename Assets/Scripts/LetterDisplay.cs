@@ -19,6 +19,10 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     [SerializeField] Color lockedColor;
 
+    [SerializeField] private Sprite defaultSprite;
+    [SerializeField] private Sprite correctSprite;
+    [SerializeField] private Sprite incorrectSprite;
+
     private Image image;
 
     public enum Type
@@ -38,6 +42,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         textMeshPro = GetComponentInChildren<TextMeshProUGUI>();
         rectTransform = GetComponent<RectTransform>();
+        image = GetComponentInChildren<Image>();
         state = State.Dragable;
     }
 
@@ -47,6 +52,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         textMeshPro.text = _letter.ToString();
         if (state == State.Locked) textMeshPro.color = lockedColor;
         else textMeshPro.color = Color.white;
+        image.sprite = defaultSprite;
     }
 
     public void ChangeState(State _state)
@@ -87,6 +93,13 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public void OnEndDrag(PointerEventData eventData)
     {
         if (state == State.Dragable && type != Type.Pista) OnDragEnd.Invoke(this.gameObject);
+    }
+
+    public void ShowCorrect(bool correct)
+    {
+        image.sprite = correct? correctSprite : incorrectSprite;
+        state = State.Locked;
+        textMeshPro.color = Color.white;
     }
 
 }
