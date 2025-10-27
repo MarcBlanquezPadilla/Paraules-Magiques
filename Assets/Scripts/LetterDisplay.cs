@@ -52,7 +52,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         textMeshPro.text = _letter.ToString();
         if (state == State.Locked) textMeshPro.color = lockedColor;
         else textMeshPro.color = Color.white;
-        image.sprite = defaultSprite;
+        if (type != Type.Pista)image.sprite = defaultSprite;
     }
 
     public void ChangeState(State _state)
