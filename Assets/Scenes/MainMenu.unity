@@ -3809,7 +3809,7 @@ MonoBehaviour:
     mode: 0
     mouseNum: 0
     wordsNum: 0
-    firstTime: 0
+    firstTime: 1
 --- !u!4 &1265787352
 Transform:
   m_ObjectHideFlags: 0
