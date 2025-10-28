@@ -90,7 +90,6 @@ public class GameManager : MonoBehaviour {
                 {
                     int divider = Mathf.Clamp(timeToEnd / 10, 1, int.MaxValue);
                     int mousesToSum = wordCounter / divider;
-                    DataManager.Instance.data.mouses += mousesToSum;
                     DataManager.Instance.data.mouseNum = mousesToSum;
                     DataManager.Instance.data.wordsNum = wordCounter;
                     ScenesManager.Instance.ChangeScene("MenuWin");
@@ -142,7 +141,6 @@ public class GameManager : MonoBehaviour {
         if (wordCounter >= wordsToWin && mode == Mode.Normal)
         {
             DataManager.Instance.data.mouseNum = 1;
-            DataManager.Instance.data.mouses += 1;
             ScenesManager.Instance.ChangeScene("MenuWin");
         }
         else

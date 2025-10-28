@@ -20,6 +20,8 @@ public class MenuRatoli : MonoBehaviour
                 text.fontSize = 65;
                 break;
         }
+        DataManager.Instance.data.mouses += DataManager.Instance.data.mouseNum;
+        DataManager.Instance.SaveData();
     }
 
     public void ChangeScene(string s)
