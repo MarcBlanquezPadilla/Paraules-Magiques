@@ -54,6 +54,12 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         state = State.Dragable;
     }
 
+    private void Update()
+    {
+        if (dragCancelled && !Input.GetMouseButton(0) && Input.touchCount == 0)
+            dragCancelled = false;
+    }
+
     public void ChangeLetter(char _letter)
     {
         letter = _letter;
@@ -76,8 +82,8 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (isLockedByRemote || state != State.Dragable || type == Type.Pista) return;
         dragCancelled = false;
+        if (isLockedByRemote || state != State.Dragable || type == Type.Pista) return;
         OnDragStart.Invoke(this.gameObject);
     }
 
