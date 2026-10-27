@@ -369,7 +369,7 @@ public class NetworkManager : MonoBehaviour
                 {
                     StopNetwork();
 
-                    if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "SampleScene")
+                    if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "MainMenu")
                     {
                         ScenesManager.Instance.ChangeScene("MainMenu");
                     }

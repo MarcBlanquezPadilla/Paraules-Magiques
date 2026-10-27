@@ -4,6 +4,7 @@ using UnityEngine;
 public class MenuRatoli : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI text;
+    [SerializeField] GameObject locker;
     
     private void Start()
     {
@@ -24,8 +25,28 @@ public class MenuRatoli : MonoBehaviour
         DataManager.Instance.SaveData();
     }
 
-    public void ChangeScene(string s)
+    private void Update()
     {
-        ScenesManager.Instance.ChangeScene(s);
+        if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
+            locker.SetActive(false);
+        else if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer)
+            locker.SetActive(true);
+        else locker.SetActive(false);
+    }
+
+    public void ChangeGameScene()
+    {
+        if (NetworkManager.Instance != null && NetworkManager.Instance.isServer)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                NetworkManager.Instance.SendText("START");
+            }
+        }
+        ScenesManager.Instance.ChangeScene("SampleScene");
+    }
+    public void ChangeMenuScene()
+    {
+        ScenesManager.Instance.ChangeScene("MainMenu");
     }
 }

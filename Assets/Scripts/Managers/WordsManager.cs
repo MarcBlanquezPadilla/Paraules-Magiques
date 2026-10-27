@@ -46,8 +46,6 @@ public class WordsManager : MonoBehaviour
     private int remoteDraggedLetterSourceIndex = -1;
     private bool remoteDraggedLetterIsFromMixed = false;
 
-    private float lastRemoteDragTime;
-
 
     private void Awake()
     {
@@ -73,13 +71,6 @@ public class WordsManager : MonoBehaviour
 
         if (timerUnlockHelp > timeToUnlockHelp) mussol.GetComponent<MussolBehaviour>().ShowPista();
         else mussol.GetComponent<MussolBehaviour>().HidePista();
-
-        if (remoteDraggedLetterSourceIndex != -1 && Time.time - lastRemoteDragTime > 0.5f)
-        {
-            LetterDisplay l = GetLetterDisplayInstance(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed);
-            EndRemoteDragVisual();
-            if (l != null) l.transform.SetSiblingIndex(l.letterIndex);
-        }
     }
 
     private void LoadWords()
@@ -340,6 +331,18 @@ public class WordsManager : MonoBehaviour
 
             if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer)
             {
+                char[] currentChars = currentWord.ToCharArray();
+                currentChars[targetIndex] = letterToMove;
+                if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
+                else
+                {
+                    mixedWord = mixedWord.Remove(sourceIndex, 1);
+                }
+                currentWord = new string(currentChars);
+
+                letterDisplay.transform.SetParent(currentLetterDisplays[targetIndex].transform);
+                letterDisplay.transform.localPosition = Vector3.zero;
+
                 NetworkManager.Instance.SendLetterMove(sourceIndex, targetIndex, dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed);
             }
             else
@@ -563,8 +566,6 @@ public class WordsManager : MonoBehaviour
         letter.transform.SetAsLastSibling();
         letter.UpdateRemotePosition(new Vector2(letterDragDTO.x, letterDragDTO.y));
         letter.SetRemoteLock(true);
-
-        lastRemoteDragTime = Time.time;
     }
 
     public void HandleRemoteDragEnd(LetterDragDTO letterDragDTO)
