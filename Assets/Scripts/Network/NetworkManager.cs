@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class NetworkManager : MonoBehaviour
@@ -45,6 +44,11 @@ public class NetworkManager : MonoBehaviour
     public Vector2 remoteCursorPosition;
     public bool hasNewRemoteCursor = false;
 
+    [Header("Connection Timeout")]
+    [SerializeField] private float connectionTimeout = 3.0f;
+    private float connectionTimer = 0f;
+    private bool isConnecting = false;
+
     private Socket m_socket;
     private EndPoint m_remoteEP;
     private Thread m_listenThread;
@@ -58,6 +62,8 @@ public class NetworkManager : MonoBehaviour
 
     private readonly ConcurrentQueue<Packet> m_inbox = new ConcurrentQueue<Packet>();
     private readonly HashSet<EndPoint> m_clients = new HashSet<EndPoint>();
+
+
 
     private void LoadPlayerName()
     {
@@ -83,16 +89,16 @@ public class NetworkManager : MonoBehaviour
 
     public void StartHost()
     {
-        isMultiplayer = true;
         isServer = true;
         StartNetwork();
     }
 
     public void StartClient(string ip)
     {
-        isMultiplayer = true;
         isServer = false;
         serverIP = ip;
+        isConnecting = true;
+        connectionTimer = 0f;
         StartNetwork();
     }
 
@@ -118,11 +124,14 @@ public class NetworkManager : MonoBehaviour
 
         remotePlayerName = "Esperant...";
         isConnected = false;
+        isMultiplayer = false;
     }
 
     private void StartNetwork()
     {
         StopNetwork();
+
+        isMultiplayer = true;
 
         try
         {
@@ -201,6 +210,16 @@ public class NetworkManager : MonoBehaviour
     private void Update()
     {
         if (!isMultiplayer) return;
+
+        if (!isServer && isConnecting && !isConnected)
+        {
+            connectionTimer += Time.deltaTime;
+            if (connectionTimer > connectionTimeout)
+            {
+                StopNetwork();
+                isConnecting = false;
+            }
+        }
 
         Packet packet;
         while (m_inbox.TryDequeue(out packet))
@@ -326,6 +345,7 @@ public class NetworkManager : MonoBehaviour
                     }
 
                     isConnected = true;
+                    isConnecting = false;
 
                     SendText("NAME_SYNC:" + playerName);
                 }

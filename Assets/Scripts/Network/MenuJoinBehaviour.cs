@@ -9,7 +9,6 @@ public class MenuJoinBehaviour : MonoBehaviour
     [SerializeField] private GameObject lobbyCanvas;
 
 
-
     public void OnIpFieldChange()
     {
         if (ipInputField == null) return;

@@ -22,6 +22,12 @@ public class MenuLobbyBehaviour : MonoBehaviour
         remoteName.text = NetworkManager.Instance.remotePlayerName;
 
         playLocker.SetActive(!NetworkManager.Instance.AreBothPlayersConnected || !NetworkManager.Instance.isServer);
+
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.isMultiplayer)
+        {
+            ExitLobby();
+            return;
+        }
     }
 
     public void OnClickEnrere()
@@ -30,7 +36,6 @@ public class MenuLobbyBehaviour : MonoBehaviour
         {
             bool isHost = NetworkManager.Instance.isServer;
 
-            NetworkManager.Instance.StopNetwork();
             if (isHost)
             {
                 if (multiplayerCanvas != null) multiplayerCanvas.SetActive(true);
@@ -41,6 +46,8 @@ public class MenuLobbyBehaviour : MonoBehaviour
                 if (multiplayerCanvas != null) multiplayerCanvas.SetActive(false);
                 if (joinCanvas != null) joinCanvas.SetActive(true);
             }
+            NetworkManager.Instance.SendText("DISCONNECT");
+            NetworkManager.Instance.StopNetwork();
         }
 
         gameObject.SetActive(false);
@@ -56,5 +63,28 @@ public class MenuLobbyBehaviour : MonoBehaviour
             }
             ScenesManager.Instance.ChangeScene("SampleScene");
         }
+    }
+    
+    public void ExitLobby()
+    {
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.StopNetwork();
+        }
+
+        bool isHost = NetworkManager.Instance != null && NetworkManager.Instance.isServer;
+
+        if (isHost)
+        {
+            if (multiplayerCanvas != null) multiplayerCanvas.SetActive(true);
+            if (joinCanvas != null) joinCanvas.SetActive(false);
+        }
+        else
+        {
+            if (multiplayerCanvas != null) multiplayerCanvas.SetActive(false);
+            if (joinCanvas != null) joinCanvas.SetActive(true);
+        }
+
+        gameObject.SetActive(false);
     }
 }
