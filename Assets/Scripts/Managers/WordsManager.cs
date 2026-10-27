@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using static GameManager;
 
 public class WordsManager : MonoBehaviour
@@ -28,7 +30,6 @@ public class WordsManager : MonoBehaviour
     [SerializeField] private Transform substituteDisplay;
     [SerializeField] private Transform remoteSubstituteDisplay;
 
-    //Help
     [SerializeField] private GameObject pistaDisplay;
     [SerializeField] private GameObject mussol;
     [SerializeField] private float timeToUnlockHelp;
@@ -59,6 +60,13 @@ public class WordsManager : MonoBehaviour
 
     private void Update()
     {
+        if (Keyboard.current != null &&
+    Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            DebugCancelDrag();
+        }
+
+
         if (!showingHelp) timerUnlockHelp += Time.deltaTime;
         else
         {
@@ -72,6 +80,22 @@ public class WordsManager : MonoBehaviour
         if (timerUnlockHelp > timeToUnlockHelp) mussol.GetComponent<MussolBehaviour>().ShowPista();
         else mussol.GetComponent<MussolBehaviour>().HidePista();
     }
+    private void DebugCancelDrag()
+    {
+        if (draggedLetterSourceIndex == -1)
+        {
+            return;
+        }
+
+        LetterDragDTO dto = new LetterDragDTO
+        {
+            letterIndex = draggedLetterSourceIndex,
+            isFromMixed = draggedLetterIsFromMixed
+        };
+
+        HandleDragCancel(dto);
+    }
+
 
     private void LoadWords()
     {
@@ -124,7 +148,7 @@ public class WordsManager : MonoBehaviour
                 if (currentWord[i] != originalWord[i]) found = true;
             } while (!found && iterations < 20);
 
-            if (found) 
+            if (found)
             {
                 pistaDisplay.SetActive(true);
                 pistaDisplay.GetComponent<LetterDisplay>().ChangeLetter(originalWord[i]);
@@ -142,13 +166,13 @@ public class WordsManager : MonoBehaviour
         timerToHideHelp = 0;
         timerUnlockHelp = 0;
         pistaDisplay.SetActive(false);
-        showingHelp=false;
+        showingHelp = false;
     }
 
     public void ChangeWord()
     {
         if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer) return;
-       
+
         //GET NEW WORD
         bool different;
         do
@@ -226,7 +250,7 @@ public class WordsManager : MonoBehaviour
 
         if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
         {
-            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+            SendState();
         }
     }
 
@@ -237,138 +261,135 @@ public class WordsManager : MonoBehaviour
         mixedWord = startMixedWord;
         UpdateDisplay();
         if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
-            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+            SendState();
     }
 
     private void UpdateDisplay()
     {
-        foreach (GameObject g in mixedLetterDisplays)
+        // MIXED
+        for (int i = 0; i < mixedLetterDisplays.Count; i++)
         {
-            g.SetActive(false);
-        }
+            GameObject g = mixedLetterDisplays[i];
+            bool show = i < mixedWord.Length && mixedWord[i] != ' ';
 
-        int lettersToDisplay = Mathf.Min(mixedWord.Length, mixedLetterDisplays.Count);
-        for (int i = 0; i < lettersToDisplay; i++)
-        {
-            LetterDisplay letterDisplay = mixedLetterDisplays[i].GetComponent<LetterDisplay>();
-            if (letterDisplay)
+            if (g.activeSelf != show) g.SetActive(show);
+            if (!show) continue;
+
+            LetterDisplay ld = g.GetComponent<LetterDisplay>();
+            if (ld)
             {
-                letterDisplay.ChangeLetter(mixedWord[i]);
-                letterDisplay.letterIndex = i;
+                ld.ChangeLetter(mixedWord[i]);
+                ld.letterIndex = i;
             }
-            mixedLetterDisplays[i].SetActive(true);
-            mixedLetterDisplays[i].transform.SetSiblingIndex(i);
+
+            if (g.transform.parent == mixedParent) g.transform.SetSiblingIndex(i);
         }
 
-        foreach (GameObject g in currentLetterDisplays)
+        // CURRENT
+        for (int i = 0; i < currentLetterDisplays.Count; i++)
         {
-            g.SetActive(false);
-        }
+            GameObject g = currentLetterDisplays[i];
+            bool show = i < currentWord.Length;
 
-        lettersToDisplay = Mathf.Min(currentWord.Length, currentLetterDisplays.Count);
-        for (int i = 0; i < lettersToDisplay; i++)
-        {
-            LetterDisplay letterDisplay = currentLetterDisplays[i].GetComponent<LetterDisplay>();
-            if (currentWord[i] == startCurrentWord[i]) letterDisplay.ChangeState(LetterDisplay.State.Locked);
-            else letterDisplay.ChangeState(LetterDisplay.State.Dragable);
-            letterDisplay.ChangeLetter(currentWord[i]);
-            letterDisplay.letterIndex = i;
-            currentLetterDisplays[i].SetActive(true);
-            currentLetterDisplays[i].transform.SetSiblingIndex(i);
+            if (g.activeSelf != show) g.SetActive(show);
+            if (!show) continue;
+
+            LetterDisplay ld = g.GetComponent<LetterDisplay>();
+            if (i < startCurrentWord.Length && currentWord[i] == startCurrentWord[i])
+                ld.ChangeState(LetterDisplay.State.Locked);
+            else
+                ld.ChangeState(LetterDisplay.State.Dragable);
+            ld.ChangeLetter(currentWord[i]);
+            ld.letterIndex = i;
+
+            if (g.transform.parent == currentParent) g.transform.SetSiblingIndex(i);
         }
     }
 
     public void OnStartDragLetter(GameObject letterDisplay)
     {
-        LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
-        draggedLetterSourceIndex = dragLetterDisplay.letterIndex;
-        draggedLetterIsFromMixed = dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed;
+        LetterDisplay letter = letterDisplay.GetComponent<LetterDisplay>();
+        bool fromMixed = letter.GetLetterType() == LetterDisplay.Type.Mixed;
 
-        if (!draggedLetterIsFromMixed)
-        {
-            substituteDisplay.GetComponentInChildren<Image>().enabled = true;
-        }
-            
+        draggedLetterSourceIndex = letter.letterIndex;
+        draggedLetterIsFromMixed = fromMixed;
+
+        Image substituteImage = substituteDisplay.GetComponentInChildren<Image>();
+        if (substituteImage != null)
+            substituteImage.enabled = !fromMixed;
+
         int visualIndex = letterDisplay.transform.GetSiblingIndex();
+
         letterDisplay.transform.SetParent(mixedParent.parent);
+
         substituteDisplay.gameObject.SetActive(true);
-        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) substituteDisplay.transform.SetParent(mixedParent);
-        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) substituteDisplay.transform.SetParent(currentParent);
-        substituteDisplay.transform.SetSiblingIndex(visualIndex);
+        substituteDisplay.SetParent(GetLetterParent(fromMixed));
+        substituteDisplay.SetSiblingIndex(visualIndex);
     }
 
     public void OnEndDragLetter(GameObject letterDisplay)
     {
-        LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
 
-        bool foundDropTarget = false;
-        int targetIndex = -1;
+        if (draggedLetterSourceIndex == -1)
+        {
+
+            return;
+        }
+
+        LetterDisplay letter = letterDisplay.GetComponent<LetterDisplay>();
 
         int sourceIndex = draggedLetterSourceIndex;
-        char letterToMove = dragLetterDisplay.GetLetter();
+        bool fromMixed = draggedLetterIsFromMixed;
+        char letterToMove = letter.GetLetter();
 
-        for (int i = 0; i < currentLetterDisplays.Count && i < currentWord.Length; i++)
+        int targetIndex = -1;
+
+        if (IsSourceStillValid(sourceIndex, fromMixed))
         {
-            if (currentWord[i] == ' ')
+            for (int i = 0; i < currentLetterDisplays.Count && i < currentWord.Length; i++)
             {
-                float minDistance = 150 / 2;
+                if (currentWord[i] != ' ')
+                    continue;
+
                 float distance = Vector2.Distance(currentLetterDisplays[i].transform.position, letterDisplay.transform.position);
 
-                if (distance < minDistance)
+                if (distance < 75f)
                 {
-                    foundDropTarget = true;
                     targetIndex = i;
                     break;
                 }
             }
         }
 
-        if (foundDropTarget)
+        if (targetIndex != -1)
         {
             AudioManager.Instance.PlayAudio("soLletres");
             letterDisplay.SetActive(false);
             HideHelp();
 
-            if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer)
-            {
-                char[] currentChars = currentWord.ToCharArray();
-                currentChars[targetIndex] = letterToMove;
-                if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
-                else
-                {
-                    mixedWord = mixedWord.Remove(sourceIndex, 1);
-                }
-                currentWord = new string(currentChars);
+            char[] currentChars = currentWord.ToCharArray();
+            currentChars[targetIndex] = letterToMove;
 
-                letterDisplay.transform.SetParent(currentLetterDisplays[targetIndex].transform);
-                letterDisplay.transform.localPosition = Vector3.zero;
-
-                NetworkManager.Instance.SendLetterMove(sourceIndex, targetIndex, dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed);
-            }
+            if (fromMixed)
+                ConsumeMixedLetter(sourceIndex);
             else
-            {
-                char[] currentChars = currentWord.ToCharArray();
-                currentChars[targetIndex] = letterToMove;
-                if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
-                else
-                {
-                    mixedWord = mixedWord.Remove(sourceIndex, 1);
-                }
-                currentWord = new string(currentChars);
+                currentChars[sourceIndex] = ' ';
 
-                if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
-                    NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+            currentWord = new string(currentChars);
+
+            if (NetworkManager.Instance.isMultiplayer)
+            {
+                if (NetworkManager.Instance.isServer)
+                    SendState();
+                else
+                    NetworkManager.Instance.SendLetterMove(sourceIndex, targetIndex, fromMixed);
             }
         }
 
-        substituteDisplay.GetComponentInChildren<Image>().enabled = false;
-        substituteDisplay.gameObject.SetActive(false);
-        substituteDisplay.transform.SetParent(mixedParent.parent);
-        if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Mixed) letterDisplay.transform.SetParent(mixedParent);
-        else if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Current) letterDisplay.transform.SetParent(currentParent);
 
-        draggedLetterSourceIndex = -1;
-        draggedLetterIsFromMixed = false;
+        letter.transform.SetParent(GetLetterParent(fromMixed));
+
+        ClearLocalDrag();
 
         UpdateDisplay();
         CheckIfSolved();
@@ -441,7 +462,7 @@ public class WordsManager : MonoBehaviour
         //RETURN MIXED WORD
         return mixedWord;
     }
-    
+
     public string GetOriginalWord()
     {
         //RETURN ORIGINAL WORD
@@ -453,7 +474,7 @@ public class WordsManager : MonoBehaviour
         //RETURN START CURRENT WORD
         return startCurrentWord;
     }
-    
+
     public string GetStartMixedWord()
     {
         //RETURN START MIXED WORD
@@ -470,7 +491,49 @@ public class WordsManager : MonoBehaviour
         return null;
     }
 
+    private void ConsumeMixedLetter(int index)
+    {
+        char[] chars = mixedWord.ToCharArray();
+        chars[index] = ' ';
+        mixedWord = new string(chars);
+    }
+
+    private bool IsSourceStillValid(int index, bool fromMixed)
+    {
+        string w = fromMixed ? mixedWord : currentWord;
+        return w != null && index >= 0 && index < w.Length && w[index] != ' ';
+    }
+    private Transform GetLetterParent(bool isFromMixed)
+    {
+        return isFromMixed ? mixedParent : currentParent;
+    }
+
+    private void RestoreLetter(LetterDisplay letter, bool isFromMixed)
+    {
+        if (letter == null) return;
+
+        letter.transform.SetParent(GetLetterParent(isFromMixed));
+        letter.transform.SetSiblingIndex(letter.letterIndex);
+    }
+
+    private void HideSubstitute(Transform substitute)
+    {
+        if (substitute == null) return;
+
+        Image image = substitute.GetComponentInChildren<Image>();
+        if (image != null) image.enabled = false;
+
+        substitute.gameObject.SetActive(false);
+        substitute.SetParent(mixedParent.parent);
+    }
+
     //MULTIPLAYER FUNCTIONS
+
+    private void SendState()
+    {
+        NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+    }
+
     public void UpdateWordState(WordStateDTO wordStateDTO)
     {
         originalWord = wordStateDTO.originalWord;
@@ -478,56 +541,49 @@ public class WordsManager : MonoBehaviour
         currentWord = wordStateDTO.currentWord;
         startMixedWord = wordStateDTO.startMixedWord;
         startCurrentWord = wordStateDTO.startCurrentWord;
-        
+
+        if (remoteDraggedLetterSourceIndex != -1 &&
+            !IsSourceStillValid(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed))
+        {
+            EndRemoteDragVisual();
+        }
+
         UpdateDisplay();
         HideHelp();
     }
 
-    public void MoveLetter(LetterMoveDTO letterMoveDTO)
+    public void MoveLetter(LetterMoveDTO dto)
     {
-        LetterDisplay letterDisplay = null;
-        if (letterMoveDTO.isFromMixed)
-        {
-            for (int i = 0; i < mixedLetterDisplays.Count; i++)
-            {
-                LetterDisplay currentLetterDisplay = mixedLetterDisplays[i].GetComponent<LetterDisplay>();
-                if (!currentLetterDisplay || currentLetterDisplay.letterIndex != letterMoveDTO.sourceIndex) continue;
+        bool invalid =
+            dto.targetIndex < 0 || dto.targetIndex >= currentWord.Length ||
+            dto.sourceIndex < 0 ||
+            !IsSourceStillValid(dto.sourceIndex, dto.isFromMixed) ||
+            currentWord[dto.targetIndex] != ' ';
 
-                letterDisplay = currentLetterDisplay;
-                break;
-            }
-        }
-        else
+        if (invalid)
         {
-            for (int i = 0; i < currentLetterDisplays.Count; i++)
-            {
-                LetterDisplay currentLetterDisplay = currentLetterDisplays[i].GetComponent<LetterDisplay>();
-                if (!currentLetterDisplay || currentLetterDisplay.letterIndex != letterMoveDTO.sourceIndex) continue;
-
-                letterDisplay = currentLetterDisplay;
-                break;
-            }
+            SendState();
+            return;
         }
-        
-        if (!letterDisplay) return;
+
+        char letterToMove = dto.isFromMixed ? mixedWord[dto.sourceIndex] : currentWord[dto.sourceIndex];
 
         char[] currentChars = currentWord.ToCharArray();
-        
-        if (currentChars[letterMoveDTO.targetIndex] == ' ')
+        currentChars[dto.targetIndex] = letterToMove;
+        if (!dto.isFromMixed) currentChars[dto.sourceIndex] = ' ';
+        else ConsumeMixedLetter(dto.sourceIndex);
+        currentWord = new string(currentChars);
+
+        if (remoteDraggedLetterSourceIndex != -1 &&
+            !IsSourceStillValid(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed))
         {
-            currentChars[letterMoveDTO.targetIndex] = letterDisplay.GetLetter();
-            if (!letterMoveDTO.isFromMixed) currentChars[letterMoveDTO.sourceIndex] = ' ';
-            else
-            {
-                mixedWord = mixedWord.Remove(letterMoveDTO.sourceIndex, 1);
-            }
-            currentWord = new string(currentChars);
-            letterDisplay.gameObject.SetActive(false);
-            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
-            UpdateDisplay();
-            HideHelp();
-            CheckIfSolved();
+            EndRemoteDragVisual();
         }
+
+        SendState();
+        UpdateDisplay();
+        HideHelp();
+        CheckIfSolved();
     }
 
     public void HandleRemoteDrag(LetterDragDTO letterDragDTO)
@@ -540,6 +596,8 @@ public class WordsManager : MonoBehaviour
                 NetworkManager.Instance.SendDragCancel(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
             return;
         }
+
+        if (!IsSourceStillValid(letterDragDTO.letterIndex, letterDragDTO.isFromMixed)) return;
 
         LetterDisplay letter = GetLetterDisplayInstance(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
         if (letter == null) return;
@@ -568,59 +626,95 @@ public class WordsManager : MonoBehaviour
         letter.SetRemoteLock(true);
     }
 
-    public void HandleRemoteDragEnd(LetterDragDTO letterDragDTO)
+    public void HandleRemoteDragEnd(LetterDragDTO dto)
     {
-        if (draggedLetterSourceIndex == letterDragDTO.letterIndex &&
-        draggedLetterIsFromMixed == letterDragDTO.isFromMixed) return;
+        LetterDisplay letter = GetLetterDisplayInstance(dto.letterIndex, dto.isFromMixed);
+
+        bool isMyLocalDrag = draggedLetterSourceIndex == dto.letterIndex && draggedLetterIsFromMixed == dto.isFromMixed;
+
+        if (isMyLocalDrag)
+        {
+            if (letter != null)
+                letter.SetRemoteLock(false);
+
+            return;
+        }
 
         EndRemoteDragVisual();
 
-        LetterDisplay letter = GetLetterDisplayInstance(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
         if (letter != null)
         {
             letter.SetRemoteLock(false);
-            letter.transform.SetParent(letterDragDTO.isFromMixed ? mixedParent : currentParent);
-            letter.transform.SetSiblingIndex(letter.letterIndex);
+            RestoreLetter(letter, dto.isFromMixed);
         }
     }
 
+
     public void HandleDragCancel(LetterDragDTO dto)
     {
-        if (draggedLetterSourceIndex != dto.letterIndex ||
-            draggedLetterIsFromMixed != dto.isFromMixed) return;
+        bool isMyLocalDrag = draggedLetterSourceIndex == dto.letterIndex && draggedLetterIsFromMixed == dto.isFromMixed;
+
+        if (!isMyLocalDrag)
+            return;
 
         LetterDisplay letter = GetLetterDisplayInstance(dto.letterIndex, dto.isFromMixed);
-        if (letter == null) return;
 
-        letter.CancelDrag();
+        if (letter != null)
+        {
+            letter.CancelLocalDrag();
+            RestoreLetter(letter, dto.isFromMixed);
+        }
 
-        substituteDisplay.GetComponentInChildren<Image>().enabled = false;
-        substituteDisplay.gameObject.SetActive(false);
-        substituteDisplay.SetParent(mixedParent.parent);
-        letter.transform.SetParent(dto.isFromMixed ? mixedParent : currentParent);
-
-        draggedLetterSourceIndex = -1;
-        draggedLetterIsFromMixed = false;
+        ClearLocalDrag();
 
         UpdateDisplay();
     }
+
 
     private void EndRemoteDragVisual()
     {
         if (remoteDraggedLetterSourceIndex == -1) return;
 
-        remoteSubstituteDisplay.GetComponentInChildren<Image>().enabled = false;
-        remoteSubstituteDisplay.gameObject.SetActive(false);
-        remoteSubstituteDisplay.SetParent(mixedParent.parent);
-
         LetterDisplay letter = GetLetterDisplayInstance(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed);
+
+        HideSubstitute(remoteSubstituteDisplay);
+
         if (letter != null)
         {
             letter.SetRemoteLock(false);
-            letter.transform.SetParent(remoteDraggedLetterIsFromMixed ? mixedParent : currentParent);
+            RestoreLetter(letter, remoteDraggedLetterIsFromMixed);
         }
 
         remoteDraggedLetterSourceIndex = -1;
         remoteDraggedLetterIsFromMixed = false;
+    }
+
+    public void CancelLocalDragFromDisplay(GameObject letterDisplay)
+    {
+        if (draggedLetterSourceIndex == -1)
+            return;
+
+        LetterDisplay letter = letterDisplay.GetComponent<LetterDisplay>();
+
+        if (letter == null)
+            return;
+
+        bool fromMixed = letter.GetLetterType() == LetterDisplay.Type.Mixed;
+
+        if (letter.letterIndex != draggedLetterSourceIndex ||
+            fromMixed != draggedLetterIsFromMixed)
+        {
+            return;
+        }
+
+        ClearLocalDrag();
+    }
+
+    private void ClearLocalDrag()
+    {
+        HideSubstitute(substituteDisplay);
+
+        draggedLetterSourceIndex = -1;
+        draggedLetterIsFromMixed = false;
     }
 }

@@ -30,7 +30,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Color originalImageColor;
 
     private bool isLockedByRemote = false;
-    private bool dragCancelled = false;
+    private bool dragCancelled;
 
     public enum Type
     {
@@ -54,11 +54,7 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         state = State.Dragable;
     }
 
-    private void Update()
-    {
-        if (dragCancelled && !Input.GetMouseButton(0) && Input.touchCount == 0)
-            dragCancelled = false;
-    }
+
 
     public void ChangeLetter(char _letter)
     {
@@ -82,36 +78,69 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (isLockedByRemote || state != State.Dragable || type == Type.Pista)
+            return;
+
         dragCancelled = false;
-        if (isLockedByRemote || state != State.Dragable || type == Type.Pista) return;
-        OnDragStart.Invoke(this.gameObject);
+
+        OnDragStart?.Invoke(gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (dragCancelled || isLockedByRemote || state != State.Dragable || type == Type.Pista) return;
+        if (dragCancelled || isLockedByRemote || state != State.Dragable || type == Type.Pista)
+        {
+            return;
+        }
 
-        OnDragStay.Invoke(this.gameObject);
+        OnDragStay?.Invoke(gameObject);
+
         rectTransform.anchoredPosition += eventData.delta / transform.root.localScale.x;
 
         if (NetworkManager.Instance != null && NetworkManager.Instance.isMultiplayer)
         {
             Vector2 pos = rectTransform.anchoredPosition;
+
             NetworkManager.Instance.SendLetterDrag(letterIndex, type == Type.Mixed, pos.x, pos.y);
         }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (dragCancelled) { dragCancelled = false; return; }
-        if (isLockedByRemote || state != State.Dragable || type == Type.Pista) return;
 
-        OnDragEnd.Invoke(this.gameObject);
+        if (dragCancelled)
+        {
+            dragCancelled = false;
+            return;
+        }
 
-        if (NetworkManager.Instance != null && NetworkManager.Instance.isMultiplayer)
+        if (isLockedByRemote || state != State.Dragable || type == Type.Pista)
+        {
+            if (isLockedByRemote)
+            {
+                WordsManager wordsManager =
+                    FindFirstObjectByType<WordsManager>();
+
+                if (wordsManager != null)
+                    wordsManager.CancelLocalDragFromDisplay(gameObject);
+            }
+
+            return;
+        }
+
+        OnDragEnd?.Invoke(gameObject);
+
+        if (NetworkManager.Instance != null &&
+            NetworkManager.Instance.isMultiplayer)
         {
             Vector2 pos = rectTransform.anchoredPosition;
-            NetworkManager.Instance.SendLetterDragEnd(letterIndex, type == Type.Mixed, pos.x, pos.y);
+
+            NetworkManager.Instance.SendLetterDragEnd(
+                letterIndex,
+                type == Type.Mixed,
+                pos.x,
+                pos.y
+            );
         }
     }
 
@@ -121,12 +150,14 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void SetRemoteLock(bool isLocked)
     {
+        if (isLockedByRemote == isLocked)
+            return;
+
         isLockedByRemote = isLocked;
 
+
         if (image != null)
-        {
             image.color = isLocked ? remoteDragColor : originalImageColor;
-        }
     }
 
     public void UpdateRemotePosition(Vector2 newPosition)
@@ -143,5 +174,12 @@ public class LetterDisplay : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         textMeshPro.color = Color.white;
     }
 
-    public void CancelDrag() => dragCancelled = true;
+    public void CancelLocalDrag()
+    {
+        dragCancelled = true;
+        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
+
+        if (canvasGroup != null)
+            canvasGroup.blocksRaycasts = true;
+    }
 }
