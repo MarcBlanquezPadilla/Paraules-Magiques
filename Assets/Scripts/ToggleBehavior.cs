@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 public class ToggleBehavior : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     [SerializeField] Sprite trueSprite;
     [SerializeField] Sprite falseSprite;
@@ -22,7 +21,8 @@ public class ToggleBehavior : MonoBehaviour
 
     public void Toggle(bool t)
     {
-        
+        if (!toggleImage) toggleImage = GetComponentInChildren<Image>();
+
         GetComponent<Toggle>().isOn = t;
         if (t) 
         { 

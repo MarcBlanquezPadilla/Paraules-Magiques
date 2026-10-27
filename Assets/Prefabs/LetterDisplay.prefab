@@ -276,6 +276,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   letter: 0
+  state: 0
+  type: 0
+  letterIndex: 0
+  OnDragStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDragStay:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDragEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  lockedColor: {r: 0, g: 0, b: 0, a: 0}
+  remoteDragColor: {r: 1, g: 0.5, b: 0.5, a: 0.7}
+  defaultSprite: {fileID: 2078728714220100509, guid: 5a7f4eb5676086c4dac5cb7d9f0b9e98, type: 3}
+  correctSprite: {fileID: -7903536155490803097, guid: d4bfb2b5cf19076468d0eba0c6de334c, type: 3}
+  incorrectSprite: {fileID: -3795729938144139804, guid: 34f3d25ada3157e4dbb325b1b571c885, type: 3}
 --- !u!114 &2010016212400930808
 MonoBehaviour:
   m_ObjectHideFlags: 0

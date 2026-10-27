@@ -11,7 +11,6 @@ public class ButtonBehaviour : MonoBehaviour
         button.onClick.AddListener(OnClick);
     }
 
-    // Update is called once per frame
     void Update()
     {
         

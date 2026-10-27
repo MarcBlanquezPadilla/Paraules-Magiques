@@ -4,7 +4,6 @@ using static GameManager;
 [CreateAssetMenu(fileName = "GameData", menuName = "Scriptable Objects/GameData")]
 public class GameData : ScriptableObject
 {
-    // Pon aquí los datos que quieres pasar
     public int mouses;
     public int difficulty;
     public int mode;
@@ -12,7 +11,6 @@ public class GameData : ScriptableObject
     public int wordsNum;
     public bool firstTime;
 
-    // Importante: Añade una función para resetear al empezar el juego
     public void Reset()
     {
         mouses = 0;

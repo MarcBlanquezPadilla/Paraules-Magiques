@@ -26,6 +26,7 @@ public class WordsManager : MonoBehaviour
     [SerializeField] private Transform currentParent;
     [SerializeField] private Transform mixedParent;
     [SerializeField] private Transform substituteDisplay;
+    [SerializeField] private Transform remoteSubstituteDisplay;
 
     //Help
     [SerializeField] private GameObject pistaDisplay;
@@ -39,8 +40,14 @@ public class WordsManager : MonoBehaviour
 
     List<string> doneWords = new List<string>();
 
-
     private int draggedLetterSourceIndex = -1;
+    private bool draggedLetterIsFromMixed = false;
+
+    private int remoteDraggedLetterSourceIndex = -1;
+    private bool remoteDraggedLetterIsFromMixed = false;
+
+    private float lastRemoteDragTime;
+
 
     private void Awake()
     {
@@ -66,6 +73,13 @@ public class WordsManager : MonoBehaviour
 
         if (timerUnlockHelp > timeToUnlockHelp) mussol.GetComponent<MussolBehaviour>().ShowPista();
         else mussol.GetComponent<MussolBehaviour>().HidePista();
+
+        if (remoteDraggedLetterSourceIndex != -1 && Time.time - lastRemoteDragTime > 0.5f)
+        {
+            LetterDisplay l = GetLetterDisplayInstance(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed);
+            EndRemoteDragVisual();
+            if (l != null) l.transform.SetSiblingIndex(l.letterIndex);
+        }
     }
 
     private void LoadWords()
@@ -142,8 +156,9 @@ public class WordsManager : MonoBehaviour
 
     public void ChangeWord()
     {
+        if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer) return;
+       
         //GET NEW WORD
-
         bool different;
         do
         {
@@ -217,76 +232,73 @@ public class WordsManager : MonoBehaviour
 
         UpdateDisplay();
         HideHelp();
+
+        if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
+        {
+            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+        }
     }
 
     public void ReloadWord()
     {
+        if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer) return;
         currentWord = startCurrentWord;
         mixedWord = startMixedWord;
-        UpdateDisplay ();
+        UpdateDisplay();
+        if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
+            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
     }
 
     private void UpdateDisplay()
     {
-        // --- Actualizar MixedLetterDisplays ---
-
-        // 1. Desactivarlos todos primero
         foreach (GameObject g in mixedLetterDisplays)
         {
             g.SetActive(false);
         }
 
-        // 2. Activar y asignar letra según el string mixedWord
         int lettersToDisplay = Mathf.Min(mixedWord.Length, mixedLetterDisplays.Count);
         for (int i = 0; i < lettersToDisplay; i++)
         {
-            mixedLetterDisplays[i].GetComponent<LetterDisplay>().ChangeLetter(mixedWord[i]);
+            LetterDisplay letterDisplay = mixedLetterDisplays[i].GetComponent<LetterDisplay>();
+            if (letterDisplay)
+            {
+                letterDisplay.ChangeLetter(mixedWord[i]);
+                letterDisplay.letterIndex = i;
+            }
             mixedLetterDisplays[i].SetActive(true);
-
-            // --- ¡AÑADE ESTA LÍNEA! ---
-            // Forzamos el orden visual para que coincida con el orden de los datos
             mixedLetterDisplays[i].transform.SetSiblingIndex(i);
         }
 
-        // --- Actualizar CurrentLetterDisplays ---
-
-        // 1. Desactivarlos todos primero
         foreach (GameObject g in currentLetterDisplays)
         {
             g.SetActive(false);
         }
 
-        // 2. Activar y asignar letra según el string currentWord
         lettersToDisplay = Mathf.Min(currentWord.Length, currentLetterDisplays.Count);
         for (int i = 0; i < lettersToDisplay; i++)
         {
-            if (currentWord[i] == startCurrentWord[i]) currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeState(LetterDisplay.State.Locked);
-            else currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeState(LetterDisplay.State.Dragable);
-            currentLetterDisplays[i].GetComponent<LetterDisplay>().ChangeLetter(currentWord[i]);
+            LetterDisplay letterDisplay = currentLetterDisplays[i].GetComponent<LetterDisplay>();
+            if (currentWord[i] == startCurrentWord[i]) letterDisplay.ChangeState(LetterDisplay.State.Locked);
+            else letterDisplay.ChangeState(LetterDisplay.State.Dragable);
+            letterDisplay.ChangeLetter(currentWord[i]);
+            letterDisplay.letterIndex = i;
             currentLetterDisplays[i].SetActive(true);
-
-            // --- ¡AÑADE ESTA LÍNEA TAMBIÉN! ---
-            // (Por consistencia y para evitar bugs futuros)
             currentLetterDisplays[i].transform.SetSiblingIndex(i);
         }
     }
 
     public void OnStartDragLetter(GameObject letterDisplay)
     {
-        // 1. Encontrar el ÍNDICE DE DATOS
-        // Buscamos el objeto que arrastramos en nuestra lista de displays
         LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
+        draggedLetterSourceIndex = dragLetterDisplay.letterIndex;
+        draggedLetterIsFromMixed = dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed;
 
-        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) draggedLetterSourceIndex = mixedLetterDisplays.IndexOf(letterDisplay);
-        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current)
+        if (!draggedLetterIsFromMixed)
         {
             substituteDisplay.GetComponentInChildren<Image>().enabled = true;
-            draggedLetterSourceIndex = currentLetterDisplays.IndexOf(letterDisplay);
         }
             
-
         int visualIndex = letterDisplay.transform.GetSiblingIndex();
-
         letterDisplay.transform.SetParent(mixedParent.parent);
         substituteDisplay.gameObject.SetActive(true);
         if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) substituteDisplay.transform.SetParent(mixedParent);
@@ -294,7 +306,6 @@ public class WordsManager : MonoBehaviour
         substituteDisplay.transform.SetSiblingIndex(visualIndex);
     }
 
-    // --- ¡FUNCIÓN MODIFICADA! ---
     public void OnEndDragLetter(GameObject letterDisplay)
     {
         LetterDisplay dragLetterDisplay = letterDisplay.GetComponent<LetterDisplay>();
@@ -303,10 +314,7 @@ public class WordsManager : MonoBehaviour
         int targetIndex = -1;
 
         int sourceIndex = draggedLetterSourceIndex;
-        char letterToMove = ' ';
-
-        if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed) letterToMove = mixedWord[sourceIndex];
-        else if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) letterToMove = currentWord[sourceIndex];
+        char letterToMove = dragLetterDisplay.GetLetter();
 
         for (int i = 0; i < currentLetterDisplays.Count && i < currentWord.Length; i++)
         {
@@ -324,53 +332,50 @@ public class WordsManager : MonoBehaviour
             }
         }
 
-        // 4. Si encontramos un hueco...
         if (foundDropTarget)
         {
             AudioManager.Instance.PlayAudio("soLletres");
-            // Modificamos los strings (el "modelo de datos")
+            letterDisplay.SetActive(false);
+            HideHelp();
 
-            // Añadir letra a currentWord
-            char[] currentChars = currentWord.ToCharArray();
-            currentChars[targetIndex] = letterToMove;
-            if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
+            if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer)
+            {
+                NetworkManager.Instance.SendLetterMove(sourceIndex, targetIndex, dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Mixed);
+            }
             else
             {
-                mixedWord = mixedWord.Remove(sourceIndex, 1);
+                char[] currentChars = currentWord.ToCharArray();
+                currentChars[targetIndex] = letterToMove;
+                if (dragLetterDisplay.GetLetterType() == LetterDisplay.Type.Current) currentChars[sourceIndex] = ' ';
+                else
+                {
+                    mixedWord = mixedWord.Remove(sourceIndex, 1);
+                }
+                currentWord = new string(currentChars);
+
+                if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
+                    NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
             }
-            currentWord = new string(currentChars);
-            
-            // Limpiar la UI del drag
-            letterDisplay.SetActive(false); // Ya no la necesitamos, UpdateDisplay creará las nuevas
-            HideHelp();
-        }
-        else
-        {
-            // Si no encontramos hueco, no hacemos nada a los strings
-            // La letra volverá a su sitio en el UpdateDisplay()
         }
 
-        // 5. Limpiamos la UI del drag (tanto si acierta como si falla)
         substituteDisplay.GetComponentInChildren<Image>().enabled = false;
         substituteDisplay.gameObject.SetActive(false);
         substituteDisplay.transform.SetParent(mixedParent.parent);
-        if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Mixed) letterDisplay.transform.SetParent(mixedParent); // La devolvemos al pool
-        else if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Current) letterDisplay.transform.SetParent(currentParent); // La devolvemos al pool
+        if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Mixed) letterDisplay.transform.SetParent(mixedParent);
+        else if (letterDisplay.GetComponent<LetterDisplay>().GetLetterType() == LetterDisplay.Type.Current) letterDisplay.transform.SetParent(currentParent);
 
-        // 6. Resetear el índice de drag
         draggedLetterSourceIndex = -1;
+        draggedLetterIsFromMixed = false;
 
-        // 7. Actualizar TODA la UI basada en los strings (la fuente de la verdad)
         UpdateDisplay();
-
-        // 8. Comprobar si se ha resuelto
         CheckIfSolved();
-       
     }
 
 
     public void CheckIfSolved()
     {
+        if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer) return;
+
         bool ended = true;
         foreach (char c in currentWord)
         {
@@ -385,14 +390,34 @@ public class WordsManager : MonoBehaviour
                 UpdateDisplay();
                 GameManager.Instance.CompleteWord();
                 AudioManager.Instance.PlayAudio("soCorrecte");
+                NetworkManager.Instance.SendText("SOLVED");
             }
             else
             {
                 GameManager.Instance.FailWord();
                 AudioManager.Instance.PlayAudio("soIncorrecte", 0.7f);
+                NetworkManager.Instance.SendText("WRONG");
             }
         }
     }
+
+    public void SetSolved(bool solved)
+    {
+        if (solved)
+        {
+            doneWords.Add(originalWord);
+            GameManager.Instance.CompleteWord();
+            ShowCorrect(true);
+            AudioManager.Instance.PlayAudio("soCorrecte");
+        }
+        else
+        {
+            GameManager.Instance.FailWord();
+            ShowCorrect(false);
+            AudioManager.Instance.PlayAudio("soIncorrecte", 0.7f);
+        }
+    }
+
     public void ShowCorrect(bool correct)
     {
         for (int i = 0; i < currentLetterDisplays.Count; i++)
@@ -400,6 +425,7 @@ public class WordsManager : MonoBehaviour
             currentLetterDisplays[i].GetComponent<LetterDisplay>().ShowCorrect(correct);
         }
     }
+
 
     public string GetCurrentWord()
     {
@@ -411,5 +437,189 @@ public class WordsManager : MonoBehaviour
     {
         //RETURN MIXED WORD
         return mixedWord;
+    }
+    
+    public string GetOriginalWord()
+    {
+        //RETURN ORIGINAL WORD
+        return originalWord;
+    }
+
+    public string GetStartCurrentWord()
+    {
+        //RETURN START CURRENT WORD
+        return startCurrentWord;
+    }
+    
+    public string GetStartMixedWord()
+    {
+        //RETURN START MIXED WORD
+        return startMixedWord;
+    }
+
+    private LetterDisplay GetLetterDisplayInstance(int index, bool isMixed)
+    {
+        List<GameObject> targetList = isMixed ? mixedLetterDisplays : currentLetterDisplays;
+        if (index >= 0 && index < targetList.Count)
+        {
+            return targetList[index].GetComponent<LetterDisplay>();
+        }
+        return null;
+    }
+
+    //MULTIPLAYER FUNCTIONS
+    public void UpdateWordState(WordStateDTO wordStateDTO)
+    {
+        originalWord = wordStateDTO.originalWord;
+        mixedWord = wordStateDTO.mixedWord;
+        currentWord = wordStateDTO.currentWord;
+        startMixedWord = wordStateDTO.startMixedWord;
+        startCurrentWord = wordStateDTO.startCurrentWord;
+        
+        UpdateDisplay();
+        HideHelp();
+    }
+
+    public void MoveLetter(LetterMoveDTO letterMoveDTO)
+    {
+        LetterDisplay letterDisplay = null;
+        if (letterMoveDTO.isFromMixed)
+        {
+            for (int i = 0; i < mixedLetterDisplays.Count; i++)
+            {
+                LetterDisplay currentLetterDisplay = mixedLetterDisplays[i].GetComponent<LetterDisplay>();
+                if (!currentLetterDisplay || currentLetterDisplay.letterIndex != letterMoveDTO.sourceIndex) continue;
+
+                letterDisplay = currentLetterDisplay;
+                break;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < currentLetterDisplays.Count; i++)
+            {
+                LetterDisplay currentLetterDisplay = currentLetterDisplays[i].GetComponent<LetterDisplay>();
+                if (!currentLetterDisplay || currentLetterDisplay.letterIndex != letterMoveDTO.sourceIndex) continue;
+
+                letterDisplay = currentLetterDisplay;
+                break;
+            }
+        }
+        
+        if (!letterDisplay) return;
+
+        char[] currentChars = currentWord.ToCharArray();
+        
+        if (currentChars[letterMoveDTO.targetIndex] == ' ')
+        {
+            currentChars[letterMoveDTO.targetIndex] = letterDisplay.GetLetter();
+            if (!letterMoveDTO.isFromMixed) currentChars[letterMoveDTO.sourceIndex] = ' ';
+            else
+            {
+                mixedWord = mixedWord.Remove(letterMoveDTO.sourceIndex, 1);
+            }
+            currentWord = new string(currentChars);
+            letterDisplay.gameObject.SetActive(false);
+            NetworkManager.Instance.SendWordState(originalWord, currentWord, mixedWord, startCurrentWord, startMixedWord);
+            UpdateDisplay();
+            HideHelp();
+            CheckIfSolved();
+        }
+    }
+
+    public void HandleRemoteDrag(LetterDragDTO letterDragDTO)
+    {
+        if (draggedLetterSourceIndex != -1 &&
+            letterDragDTO.letterIndex == draggedLetterSourceIndex &&
+            letterDragDTO.isFromMixed == draggedLetterIsFromMixed)
+        {
+            if (NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)
+                NetworkManager.Instance.SendDragCancel(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
+            return;
+        }
+
+        LetterDisplay letter = GetLetterDisplayInstance(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
+        if (letter == null) return;
+
+        bool isNewDrag = remoteDraggedLetterSourceIndex != letterDragDTO.letterIndex ||
+                         remoteDraggedLetterIsFromMixed != letterDragDTO.isFromMixed;
+
+        if (isNewDrag)
+        {
+            EndRemoteDragVisual();
+
+            remoteDraggedLetterSourceIndex = letterDragDTO.letterIndex;
+            remoteDraggedLetterIsFromMixed = letterDragDTO.isFromMixed;
+
+            int visualIndex = letter.transform.GetSiblingIndex();
+            letter.transform.SetParent(mixedParent.parent);
+
+            remoteSubstituteDisplay.GetComponentInChildren<Image>().enabled = !letterDragDTO.isFromMixed;
+            remoteSubstituteDisplay.gameObject.SetActive(true);
+            remoteSubstituteDisplay.SetParent(letterDragDTO.isFromMixed ? mixedParent : currentParent);
+            remoteSubstituteDisplay.SetSiblingIndex(visualIndex);
+        }
+
+        letter.transform.SetAsLastSibling();
+        letter.UpdateRemotePosition(new Vector2(letterDragDTO.x, letterDragDTO.y));
+        letter.SetRemoteLock(true);
+
+        lastRemoteDragTime = Time.time;
+    }
+
+    public void HandleRemoteDragEnd(LetterDragDTO letterDragDTO)
+    {
+        if (draggedLetterSourceIndex == letterDragDTO.letterIndex &&
+        draggedLetterIsFromMixed == letterDragDTO.isFromMixed) return;
+
+        EndRemoteDragVisual();
+
+        LetterDisplay letter = GetLetterDisplayInstance(letterDragDTO.letterIndex, letterDragDTO.isFromMixed);
+        if (letter != null)
+        {
+            letter.SetRemoteLock(false);
+            letter.transform.SetParent(letterDragDTO.isFromMixed ? mixedParent : currentParent);
+            letter.transform.SetSiblingIndex(letter.letterIndex);
+        }
+    }
+
+    public void HandleDragCancel(LetterDragDTO dto)
+    {
+        if (draggedLetterSourceIndex != dto.letterIndex ||
+            draggedLetterIsFromMixed != dto.isFromMixed) return;
+
+        LetterDisplay letter = GetLetterDisplayInstance(dto.letterIndex, dto.isFromMixed);
+        if (letter == null) return;
+
+        letter.CancelDrag();
+
+        substituteDisplay.GetComponentInChildren<Image>().enabled = false;
+        substituteDisplay.gameObject.SetActive(false);
+        substituteDisplay.SetParent(mixedParent.parent);
+        letter.transform.SetParent(dto.isFromMixed ? mixedParent : currentParent);
+
+        draggedLetterSourceIndex = -1;
+        draggedLetterIsFromMixed = false;
+
+        UpdateDisplay();
+    }
+
+    private void EndRemoteDragVisual()
+    {
+        if (remoteDraggedLetterSourceIndex == -1) return;
+
+        remoteSubstituteDisplay.GetComponentInChildren<Image>().enabled = false;
+        remoteSubstituteDisplay.gameObject.SetActive(false);
+        remoteSubstituteDisplay.SetParent(mixedParent.parent);
+
+        LetterDisplay letter = GetLetterDisplayInstance(remoteDraggedLetterSourceIndex, remoteDraggedLetterIsFromMixed);
+        if (letter != null)
+        {
+            letter.SetRemoteLock(false);
+            letter.transform.SetParent(remoteDraggedLetterIsFromMixed ? mixedParent : currentParent);
+        }
+
+        remoteDraggedLetterSourceIndex = -1;
+        remoteDraggedLetterIsFromMixed = false;
     }
 }

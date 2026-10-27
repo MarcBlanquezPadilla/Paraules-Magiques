@@ -21,6 +21,12 @@ public class MainMenuManager : MonoBehaviour
         MenuLore.SetActive(false);
         if (!AudioManager.Instance.IsPlaying("musicaMenu")) AudioManager.Instance.PlaySong("musicaMenu");
         mouseCounter.GetComponentInChildren<TextMeshProUGUI>().text = DataManager.Instance.data.mouses.ToString();
+
+        if (NetworkManager.Instance.isMultiplayer)
+        {
+            NetworkManager.Instance.SendText("DISCONNECT");
+            NetworkManager.Instance.StopNetwork();
+        }
     }
 
     public void OpenMenu(GameObject nextMenu)
@@ -75,5 +81,38 @@ public class MainMenuManager : MonoBehaviour
     public void ChangeDiff(int diff)
     {
         DataManager.Instance.ChangeDifficulty(diff);
+    }
+    public void OnClickCreateHost()
+    {
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.StartHost();
+            ScenesManager.Instance.ChangeScene("SampleScene");
+        }
+    }
+
+    public void OnClickJoinClient(TMP_InputField ipInputField)
+    {
+        if (NetworkManager.Instance != null)
+        {
+            string targetIP = "127.0.0.1";
+
+            if (ipInputField != null && !string.IsNullOrEmpty(ipInputField.text))
+            {
+                targetIP = ipInputField.text.Trim();
+            }
+
+            NetworkManager.Instance.StartClient(targetIP);
+            ScenesManager.Instance.ChangeScene("SampleScene");
+        }
+    }
+
+    public void OnClickPlaySingleplayer()
+    {
+        if (NetworkManager.Instance != null)
+        {
+            NetworkManager.Instance.isMultiplayer = false;
+        }
+        ScenesManager.Instance.ChangeScene("SampleScene");
     }
 }

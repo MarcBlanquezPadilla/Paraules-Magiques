@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private int timeToEnd;
     [SerializeField] private float timeCorrectWord;
 
-    private WordsManager _wordsManager;
+    private WordsManager wordsManager;
     [SerializeField] private BruixaBehaviour _bruixa;
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject tutorialMenu;
@@ -60,15 +60,19 @@ public class GameManager : MonoBehaviour {
 
         difficulty = (Difficulty)DataManager.Instance.data.difficulty;
         mode = (Mode)DataManager.Instance.data.mode;
-        _wordsManager = GetComponent<WordsManager>();
+        wordsManager = GetComponent<WordsManager>();
         wordCounter = 0;
 
     }
 
     private void Start() {
 
+        if (NetworkManager.Instance.isMultiplayer && !NetworkManager.Instance.isServer)
+            NetworkManager.Instance.SendText("SYNC_BOARD");
+        else
+            wordsManager.ChangeWord();
+
         contadorRatoli.GetComponentInChildren<TextMeshProUGUI>().text = DataManager.Instance.data.mouses.ToString();
-        _wordsManager.ChangeWord();
         pauseMenu.SetActive(false);
         tutorialMenu.SetActive(false);
     }
@@ -77,7 +81,6 @@ public class GameManager : MonoBehaviour {
     {
         endTimer += Time.deltaTime;
         
-
         switch (mode)
         {
             case Mode.Normal:
@@ -97,14 +100,14 @@ public class GameManager : MonoBehaviour {
                 break;
         }
 
-        if (changingWord)
+        if (changingWord && (!NetworkManager.Instance.isMultiplayer ||( NetworkManager.Instance.isMultiplayer && NetworkManager.Instance.isServer)))
         {
             correctWordTimer += Time.deltaTime;
 
             if (correctWordTimer > timeCorrectWord) 
             {
-                if (correct) _wordsManager.ChangeWord();
-                else _wordsManager.ReloadWord();
+                if (correct) wordsManager.ChangeWord();
+                else wordsManager.ReloadWord();
                 changingWord = false;
             }
         }
@@ -148,7 +151,7 @@ public class GameManager : MonoBehaviour {
             correctWordTimer = 0;
             changingWord = true;
             correct = true;
-            _wordsManager.ShowCorrect(correct);
+            wordsManager.ShowCorrect(correct);
             _bruixa.BruixaHappy();
         }
     }
@@ -158,7 +161,7 @@ public class GameManager : MonoBehaviour {
         correct = false;
         correctWordTimer = 0;
         changingWord = true;
-        _wordsManager.ShowCorrect(correct);
+        wordsManager.ShowCorrect(correct);
         _bruixa.BruixaSad();
     }
 
